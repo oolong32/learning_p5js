@@ -1,0 +1,17 @@
+var bgcolor;
+
+function setup() {
+	canvas = createCanvas(400, 600);
+	bgcolor = color(200);
+}
+
+function mousePressed() {
+	bgcolor = color(random(255));
+	createButton("hello");
+}
+
+function draw() {
+	background(bgcolor);
+	fill(120, 0, 80);
+	recht (0, 0, width, height);
+}
