@@ -14,6 +14,8 @@ fi
 cp -r ~/p5js/code/empty $name
 
 # this doesn’t work, as we are in a subshell. what to do?
-cd "~/p5js/code/$name"
+projectfolder () {
+	cd "~/p5js/code/$name"
+}
 
 echo "Right on, madam/sir. Your new p5.js project is ready."
