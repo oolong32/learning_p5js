@@ -17,7 +17,7 @@ var split_length = function() {
 	var x = 0;
 	var arr = [];
 	while (x < width) {
-		var foo = Math.floor(random(10, 50));
+		var foo = Math.floor(random(40, 90));
 		arr.push(foo);
 		x += foo;
 	}
