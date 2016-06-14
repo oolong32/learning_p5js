@@ -2,6 +2,7 @@ var tune;
 var sliderVolume;
 // var sliderRate;
 // var sliderPan;
+var col = 0;
 
 function setup() {
   createCanvas(300, 400);
@@ -31,8 +32,11 @@ function togglePlaying() {
 }
 
 function draw() {
-  background(random(255));
+  backCol = noise(col);
+  backCol = map(backCol, 0, 1, 0, 255); 
+  background(Math.floor(backCol));
   // tune.pan(sliderPan.value());
   // tune.rate(sliderRate.value());
   tune.setVolume(sliderVolume.value());
+  col += 0.001;
 }
