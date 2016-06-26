@@ -11,12 +11,12 @@ function setup() {
   createCanvas(500, 500);
 
   /* move raster into the center of the canvas */
-  var origin_x = ((width - (FIELD + MARGIN)) % (FIELD + MARGIN)) / 2;
-  var origin_y = ((height - (FIELD + MARGIN)) % (FIELD + MARGIN)) / 2;
+  var orig_x = ((width - (FIELD + MARGIN)) % (FIELD + MARGIN)) / 2;
+  var orig_y = ((height - (FIELD + MARGIN)) % (FIELD + MARGIN)) / 2;
 
   /* create raster with margin between fields */
-  for ( var y = origin_y; y < (height - FIELD); y += (FIELD + MARGIN) ) {
-    for ( var x = origin_x; x < (width - FIELD); x += (FIELD + MARGIN) ) {
+  for ( var y = orig_y; y < (height - FIELD); y += (FIELD + MARGIN) ) {
+    for ( var x = orig_x; x < (width - FIELD); x += (FIELD + MARGIN) ) {
       triangles.push(new Triangle( x, y, FIELD ));
     }
   }
@@ -33,6 +33,6 @@ function draw() {
     triangles[i].redraw( xoff + i * 10 );
     triangles[i].display();
   }
-  xoff += 0.01;
+  xoff += 0.005;
 
 }
