@@ -7,11 +7,11 @@ function setup() {
 function draw() {
   background( 51 );
 
-  translate( width / 2, height / 2 );
-  rotate( angle );
+  translate(width/2, height/2);
   strokeWeight( 4 );
+  noFill();
   stroke( 255 );
-  line( 0, 0, 100, 0 );
-  angle += 0.01;
-
+  rotate(angle);
+  rect(-26, -26, 52, 52);
+  angle += 0.1;
 }
