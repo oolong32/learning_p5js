@@ -1,15 +1,28 @@
 var video;
 var vScale = 16;
+var rows = 30;
+var cols = 40;
+var boxes = [];
 
 function setup() {
-  createCanvas( 640, 480 ); 
+  noCanvas();
   pixelDensity( 1 ); // because retina screen
   video = createCapture( VIDEO );
-  video.size( width / vScale, height / vScale );
+  video.size( cols, rows );
+  slider = createSlider( 0, 255, 90 );
+
+  for ( var y = 0; y < rows; y += 1 ) {
+    for ( var x = 0; x < cols; x += 1 ) {
+      var box = createCheckbox();
+      box.parent( 'mirror' );
+      boxes.push( box );
+    }
+    var br = createElement('br');
+    br.parent( 'mirror' );
+  }
 }
 
 function draw() {
-  background( 51 );
   video.loadPixels();
 
   for ( var y = 0; y < video.height; y += 1 ) {
@@ -21,17 +34,15 @@ function draw() {
       var g = video.pixels[ index + 1 ];
       var b = video.pixels[ index + 2 ];
 
-      var threshold = 127;
+      var threshold = slider.value();
       var bright = ( r + g + b ) / 3;
-
+      
+      var checkindex = x + y * cols;
       if ( bright > threshold ) {
-        fill( 255 );
+        boxes[ checkindex ].checked( false );
       } else {
-        fill( 0 );
+        boxes[ checkindex ].checked( true );
       }
-
-      rectMode( CENTER );
-      rect( x * vScale, y * vScale, vScale, vScale );
     }
   }
 }
