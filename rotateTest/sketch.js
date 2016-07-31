@@ -13,5 +13,5 @@ function draw() {
   stroke( 255 );
   rotate(angle);
   rect(-26, -26, 52, 52);
-  angle += 0.1;
+  angle += 0.03;
 }
