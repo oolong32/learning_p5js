@@ -5,6 +5,7 @@ var dA = 1;
 var dB = 0.5;
 var feed = 0.055;
 var k = 0.062;
+// values according to http://karlsims.com/rd.html
 
 function setup() {
   createCanvas( 200, 200 );
@@ -15,8 +16,15 @@ function setup() {
     grid[ y ] = [];
     next[ y ] = [];
     for ( var x = 0; x < width; x++ ) {
-      grid[ y ][ x ] = { a: random( 1 ), b: random( 1 ) };
-      next[ y ][ x ] = { a: 0, b: 0 };
+      grid[ y ][ x ] = { a: 1, b: 0 };
+      next[ y ][ x ] = { a: 1, b: 0 };
+    }
+  }
+
+  for ( var i = 100; i < 110; i++ ) {
+    for ( var j = 100; j < 110; j++ ) {
+      // pour some chemicals into the petri dish
+      grid[ i ][ j ].b = 1;
     }
   }
 }
@@ -24,26 +32,29 @@ function setup() {
 function draw() {
   background( 111 );
 
-  for ( var y = 0; y < height; y++ ) {
-    for ( var x = 0; x < height; x++ ) {
-      var na = next[ y ][ x ].a;
+  // don’t do the edges, otherwise there will be errors when checking the edges
+  for ( var y = 1; y < height - 1; y++ ) {
+    for ( var x = 1; x < width - 1; x++ ) {
       var ga = grid[ y ][ x ].a;
-      var nb = next[ y ][ x ].b;
       var gb = grid[ y ][ x ].b;
       // formula as in http://karlsims.com/rd.html
-      na = ga + ( dA * laplaceA( y, x) ) - ( ga * gb * gb ) + ( feed * ( 1 - ga ) ); 
-
-      nb = gb + ( dB * laplaceB( y, x) ) - ( ga * gb * gb ) - ( ( k + feed ) * gb ); 
+      next[y][x].a = ga + ( dA * laplaceA( y, x) ) - ( ga * gb * gb ) + ( feed * ( 1 - ga ) ); 
+      next[y][x].b = gb + ( dB * laplaceB( y, x) ) + ( ga * gb * gb ) - ( ( k + feed ) * gb ); 
+      next[ y ][ x ].a = constrain(next[ y ][ x ].a, 0, 1);
+      next[ y ][ x ].b = constrain(next[ y ][ x ].b, 0, 1);
     }
   }
 
   loadPixels();
   for ( var y = 0; y < height; y++ ) {
-    for ( var x = 0; x < height; x++ ) {
+    for ( var x = 0; x < width; x++ ) {
       pix = ( x + y * width ) * 4;
-      pixels[ pix + 0 ] = floor( next[ y ][ x ].a * 255);
-      pixels[ pix + 1 ] = 0;
-      pixels[ pix + 2 ] = floor( next[ y ][ x ].b * 255 );
+      var a = next[ y ][ x ].a;
+      var b = next[ y ][ x ].b;
+      var c = floor( ( a - b ) * 255 );
+      pixels[ pix + 0 ] = c;
+      pixels[ pix + 1 ] = c;
+      pixels[ pix + 2 ] = c;
       pixels[ pix + 3 ] = 255;
     }
   }
