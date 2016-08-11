@@ -13,9 +13,4 @@ fi
 # make instance of "empty" project, set name to argument
 cp -r ~/p5js/code/empty $name
 
-# this doesn’t work, as we are in a subshell. what to do?
-projectfolder () {
-	cd "~/p5js/code/$name"
-}
-
 echo "Right on, madam/sir. Your new p5.js project is ready."
