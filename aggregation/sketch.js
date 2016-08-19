@@ -12,7 +12,7 @@ function setup() {
 
   tree[ 0 ] = new Walker( width / 2, height / 2, true );
 
-  for ( var i = 0; i < 1000; i++ ) {
+  for ( var i = 0; i < maxWalkers; i++ ) {
     walkers[ i ] = new Walker();
   }
 }
