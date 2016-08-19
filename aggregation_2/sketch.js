@@ -50,4 +50,4 @@ function draw() {
   //   walkers.push( new Walker() );
   // }
 
-  }
+}
