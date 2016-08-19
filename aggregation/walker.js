@@ -2,7 +2,7 @@ function Walker( x, y, stuck ) {
 
   this.stuck = stuck; // no argument = falsy
 
-  if ( x && y ) {
+  if ( x != undefined && y != undefined ) {
     this.pos = createVector( x, y );
   } else {
     this.pos = randomPoint();
