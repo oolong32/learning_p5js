@@ -1,1 +1,3 @@
-# learning_p5js
+# Learning p5.js
+
+Many exercises, experiments and whatnot for learning much good.
