@@ -37,12 +37,12 @@ function Dot() {
     push()
     this.alpha = 50;
     var fade = 50/this.memDepth;
+    line(this.x, this.y, this.x, this.y + this.velocity);
     for (var m = this.memory.length; m >= 0 ; m -= 2) {
       this.alpha -= fade;
       noFill();
       stroke(this.setColor());
       ellipse(this.x, this.memory[m], this.s, this.s);
-      line(this.x, this.y, this.x, this.y + this.velocity);
     }
     pop();
     this.alpha = 255;
