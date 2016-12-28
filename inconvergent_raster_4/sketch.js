@@ -20,7 +20,7 @@ function setup() {
   for (var i = 0; i <= rows; i++) {
     for (var j = 0; j <= cols; j++) {
       points.push(new Dot(j*cell_w + offset_x, i*cell_h + offset_y));
-      console.log(points[points.length-1].open);
+      //console.log(points[points.length-1].open);
     }
   }
 
