@@ -5,16 +5,18 @@ function Mover() {
 	this.acceleration = createVector();
 	this.topspeed = 5;
 
-	this.move = function() {
-		this.mouse = createVector(mouseX, mouseY);
-		this.mouse.sub(this.position);
-		this.mouse.setMag(0.5);
-		this.acceleration = this.mouse;
-
+	this.update = function() {
 		this.velocity.add(this.acceleration);
 		this.velocity.limit(this.topspeed);
 		this.position.add(this.velocity);
+
+    // reset acceleration
+    this.acceleration = this.acceleration.mult(0);
 	};
+
+  this.applyForce = function(f) {
+    this.acceleration.add(f);
+  }
 
 	this.display = function() {
 		noStroke();
@@ -23,15 +25,11 @@ function Mover() {
 	};
 
 	this.edges = function() {
-		if ( this.position.x > width ) {
-			this.position.x = 0;
-		} else if ( this.position.x < 0 ) {
-			this.position.x = width;
+		if (this.position.x > width || this.position.x < 0) {
+			this.velocity.x	= this.velocity.x * -1;
 		}
-		if ( this.position.y > height ) {
-			this.position.y = 0;
-		} else if ( this.position.y < 0 ) {
-			this.position.y = height;
+		if (this.position.y > height || this.position.y < 0) {
+			this.velocity.y	= this.velocity.y * -1;
 		}
 	};
 
