@@ -1,9 +1,11 @@
 function Ball() {
 	this.location = createVector(width/2, height/2);
 	this.velocity = createVector(2.5, -2);
+
 	this.move = function() {
 		this.location = this.location.add(this.velocity);
 	};
+
 	this.bounce = function() {
 		if (this.location.x > width || this.location.x < 0) {
 			this.velocity.x	= this.velocity.x * -1;
@@ -12,6 +14,7 @@ function Ball() {
 			this.velocity.y	= this.velocity.y * -1;
 		}
 	};
+
 	this.display = function() {
 		background(0);
 		noStroke();
