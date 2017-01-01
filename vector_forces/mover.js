@@ -1,4 +1,4 @@
-function Walker() {
+function Mover() {
 	//this.position = createVector(width/2, height/2);
 	this.position = createVector(random(width), random(height));
 	this.velocity = createVector();
@@ -22,7 +22,7 @@ function Walker() {
 		ellipse(this.position.x, this.position.y, 25, 25);
 	};
 
-	this.checkEdges = function() {
+	this.edges = function() {
 		if ( this.position.x > width ) {
 			this.position.x = 0;
 		} else if ( this.position.x < 0 ) {
