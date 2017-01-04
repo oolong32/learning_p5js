@@ -22,7 +22,7 @@ function draw() {
 		movers[i].applyForce(wind);
 
     // apply friction
-    friction = movers[i].velocity.copy();
+    var friction = movers[i].velocity.copy();
     friction.normalize();
     friction.mult(-1);
     var c = 0.1; // friction coeficient (arbitrarily set)
