@@ -10,13 +10,16 @@ function setup() {
 function draw() {
 	background(0);
 
-	var f = createVector(0, 0.1);	
-  for (var i = 0; i < movers.length; i++) {
-	movers[i].applyForce(f);
 
-	movers[i].update();
-	movers[i].edges();
-	movers[i].display(); 
+  for (var i = 0; i < movers.length; i++) {
+    var gravity = createVector(0, 0.3);	
+    // scale gravity according to object’s mass
+    gravity.mult(movers[i].mass);
+    movers[i].applyForce(gravity);
+
+    movers[i].update();
+    movers[i].edges();
+    movers[i].display(); 
   }
 }
 
