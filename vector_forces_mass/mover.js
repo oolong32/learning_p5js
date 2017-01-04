@@ -17,7 +17,7 @@ function Mover() {
 
   this.applyForce = function(f) {
     // divide force by mass
-    nf = p5.Vector.div(f, this.mass);
+    var nf = p5.Vector.div(f, this.mass);
     this.acceleration.add(nf);
   }
 
