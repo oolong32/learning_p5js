@@ -1,3 +1,6 @@
+// Dan Shiffman, Coding Challenge #55
+// https://youtu.be/f5QBExMNB1I
+// https://en.wikipedia.org/wiki/Rose_%28mathematics%29
 function setup() {
   createCanvas(600, 600);
 }
