@@ -1,9 +1,12 @@
 var particles;
 var phenomenon;
+var shrink_button;
+var grow_button;
 
 function setup() {
+  // pixelDensity(1.0);
   createCanvas(500, 400);
-  frameRate(2);
+  frameRate(5);
 
   // create a couple of particles
   // by drawing on a circle
@@ -23,9 +26,30 @@ function setup() {
     particles.push(p);
     num += 1;
   }
-  // bis auf Weiteres: Phaenomenon besteht aus zufälliger Auswahl aus verfügbaren Partikeln.
+  // bis auf Weiteres:
+  // Phaenomenon besteht aus zufälliger Auswahl aus verfügbaren Partikeln.
   phenomenon = new Phenomenon(particles, 7);
   phenomenon.initialize();
+  phenomenon.findSmallestGap();
+  phenomenon.findBiggestGap();
+
+  // buttons (testweise)
+  // bedenke: wir wollen nicht einfach vergrössern/-kleinern,
+  // sondern von einem objekt zum anderen wechseln.
+  shrink_button = createButton('shrink');
+  grow_button = createButton('grow');
+  shrink_button.mousePressed(wane);
+  grow_button.mousePressed(wax);
+  
+
+}
+
+function wax() {
+  phenomenon.grow = true;
+}
+
+function wane() {
+  phenomenon.shrink = true;
 }
 
 function draw() {
@@ -37,7 +61,9 @@ function draw() {
     particles[i].repraesentieren();
   }
   phenomenon.display("yes");
-  phenomenon.reducePhenomeon();
+  if (phenomenon.shrink === true) { // wahrscheinlich wärs gescheiter diese bedingung im objekt unterzubringen?
+    phenomenon.reducePhenomeon();
+  }
   // works :-)
   // todo: das selbe für zusätzliche partikel:
   // - wo gibt es die grösste lücke?
