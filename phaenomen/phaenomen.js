@@ -68,42 +68,43 @@ function Phenomenon(p_list, num) {
   }
 
   this.compareGaps = function() {
+    // returns array with distances between active particles
     var nums = this.current_form.map(function(p) {return p.num;});
-    var gaps = []
+    var gaps = [];
     for (var n = 0; n < nums.length; n++) {
       if (n === nums.length - 1) {
-        gaps.push(this.anzahl_Partikel + nums[0] - nums[nums.length-1]);
+        gaps.push([nums[n], this.anzahl_Partikel + nums[0] - nums[nums.length-1]]);
       } else {
-        var gap = nums[n+1] - nums[n]
-        gaps.push(gap);
+        var gap = nums[n+1] - nums[n];
+        gaps.push([nums[n], gap]);
       }
     }
     return gaps;
   }
 
   this.findSmallestGap = function() {
+    // returns array of smallest gap between active particles and it’s preceeding particle
     var gaps = this.compareGaps();
     var smallest_gap = gaps.reduce(function(curr, next) {
-      if (curr <= next) {
+      if (curr[1] <= next[1]) {
         return curr;
       } else {
         return next;
       }
     });
-    // console.log(smallest_gap);
     return smallest_gap;
   }
 
   this.findBiggestGap = function() {
+    // returns array of largest gap between active particles and it’s preceeding particle
     var gaps = this.compareGaps();
     var biggest_gap = gaps.reduce(function(curr, next) {
-      if (curr >= next) {
+      if (curr[1] >= next[1]) {
         return curr;
       } else {
         return next;
       }
     });
-    // console.log(biggest_gap);
     return biggest_gap;
   }
 
