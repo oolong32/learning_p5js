@@ -66,7 +66,6 @@ function draw() {
   }
   // works :-)
   // todo: das selbe für zusätzliche partikel:
-  // - wo gibt es die grösste lücke?
   // - wie müssen die punkte verschoben werden, um mit denen des nächsten partikels übereinzustimmen?
   // dann: umschalten zwischen zwei partikeln
   // dann: umschalten zwischen vielen partikeln
