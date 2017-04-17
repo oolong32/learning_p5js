@@ -1,18 +1,23 @@
 function Phenomenon(p_list, num) {
-  this.gesamt_partikel = p_list;
-  this.anzahl_Partikel = p_list.length;
+  this.gesamt_partikel = p_list; // all particle objects
+  // wichtige Frage:
+  // ist das eine Kopie von p_list oder nicht?
+
+  this.anzahl_partikel = p_list.length;
   this.shrink = false;
   this.grow = false;
 
   this.random_indexes = [];    // bis auf Weiteres Auswahl
   this.aktive_partikel = [];   // Auswahl aus p_list
   this.inaktive_partikel = []; // Rest der p_list
-  this.current_form = [];      // wird gebraucht, damit die ursprüngliche Form des Phänomens unverändert bleibt, auch wenn sich das Phänomen der Form eines «Nachbarn» annähert (siehe reducePhenomenon/pullLast).
+  this.current_form = [];      // wird gebraucht, damit die ursprüngliche
+  // Form des Phänomens unverändert bleibt, auch wenn sich das Phänomen
+  // der Form eines «Nachbarn» annähert (siehe reducePhenomenon/pullLast).
 
   this.initialize = function() {
     // choose active Particle’s indexes
     while (this.random_indexes.length < num) {
-      random_index = floor(random(this.anzahl_Partikel));
+      random_index = floor(random(this.anzahl_partikel));
       if (this.random_indexes.length < 1) {
         this.random_indexes.push(random_index);
       } else {
@@ -30,7 +35,7 @@ function Phenomenon(p_list, num) {
       }
     }
     // divide Particles into active and inactive
-    for (var i = 0; i < this.gesamt_partikel.length; i++) {
+    for (var i = 0; i < this.anzahl_partikel; i++) {
       var found = false;
       for (var n = 0; n < this.random_indexes.length; n++) {
         if (i === this.random_indexes[n]) {
@@ -46,33 +51,17 @@ function Phenomenon(p_list, num) {
     }
   }
 
-  this.reducePhenomeon = function(start_index, target_index) {
+  this.reducePhenomeon = function() {
     // identify position of last active particle
-    var last_num = this.current_form[this.current_form.length-1].num;
     var gap = this.findSmallestGap()[1];
     var pos_left_particle = this.findSmallestGap()[0].num;
-    var pos_right_particle = pos_left_particle + gap;
+    var pos_right_particle = (pos_left_particle + gap) % this.anzahl_partikel;
 
-    // erste bedingung obsolet, es müssten sowieso mehr als zwei einträge sein!?
     if (this.current_form.length > 1) { // more than one particle in phenomenon
-      if (pos_right_particle != pos_left_particle) { // left particle distinct from right particle
-        console.log((this.findSmallestGap()[2] + 1) % this.current_form.length);
-        // ist das das richtige argument? prüfen
-        //!!! 
-        // wünschenswert wäre der index des partikels in current_form
-        // die eigenschaft .num sollte erst in pullLast relevant werden
-        //!!!
+      if (pos_right_particle % this.anzahl_partikel != pos_left_particle) { // left particle distinct from right particle
         this.pullLast((this.findSmallestGap()[2] + 1) % this.current_form.length);
       } else { // last and second_last overlapping
-        //
-        //
-        // this seems to lead to an error?
-        // sometimes the wrong particles get spliced
-        // how to avoid?
-        // wird hier der richtige index geliefert?
-        // offensichtlich gibt es fehler, bei letztem index + 1 (depp)
-        //
-        this.current_form.splice(this.findSmallestGap()[2] + 1, 1);
+        this.current_form.splice((this.findSmallestGap()[2] + 1) % this.current_form.length, 1);
         this.shrink = false;
         return null;
       }
@@ -83,24 +72,22 @@ function Phenomenon(p_list, num) {
     }
   }
 
-  this.compareGaps = function() {
+  this.listGaps = function() {
     // returns array with gaps between active particles,
     // and the particle before each gap, and the index in the current_form array
     var gaps = [];
     for (var n = 0; n < this.current_form.length; n++) {
-      if (n === this.current_form.length - 1) { // last gap reaches till the first particle
-        gaps.push([this.current_form[n], this.anzahl_Partikel + this.current_form[0].num - this.current_form[this.current_form.length-1].num, n]);
-      } else {
-        var gap = this.current_form[n+1].num - this.current_form[n].num;
-        gaps.push([this.current_form[n], gap, n]);
-      }
+      var next_point = (n + 1) % this.current_form.length; // sonst gibts beim letzten Punkt Fehler
+      // hier Modulo um Unstimmigkeiten um den Nullpunkt herum zu vermeiden
+      var gap = (this.current_form[next_point].num + this.anzahl_partikel - this.current_form[n].num) % this.anzahl_partikel;
+      gaps.push([this.current_form[n], gap, n]);
     }
     return gaps;
   }
 
   this.findSmallestGap = function() {
     // returns array of smallest gap between active particles and it’s preceeding particle
-    var gaps = this.compareGaps();
+    var gaps = this.listGaps();
     var smallest_gap = gaps.reduce(function(curr, next) {
       if (curr[1] <= next[1]) {
         return curr;
@@ -113,7 +100,7 @@ function Phenomenon(p_list, num) {
 
   this.findBiggestGap = function() {
     // returns array of largest gap between active particles and it’s preceeding particle
-    var gaps = this.compareGaps();
+    var gaps = this.listGaps();
     var biggest_gap = gaps.reduce(function(curr, next) {
       if (curr[1] >= next[1]) {
         return curr;
@@ -124,13 +111,10 @@ function Phenomenon(p_list, num) {
     return biggest_gap;
   }
 
-  this.pullLast = function(i) { // ‘moves’ particle at index i one space counterclockwise
-    if (i === 0) {
-      // avoid a negative index and thus an error
-      this.current_form[i] = this.gesamt_partikel[this.gesamt_partikel.length - 1]; 
-    } else {
-      this.current_form[i] = this.gesamt_partikel[this.current_form[i].num - 1]; 
-    }
+  this.pullLast = function(i) { // ‘moves’ particle at index i one space ccw
+    // Modulo verhindert Probleme am Nullpunkt
+    var preceding = (this.current_form[i].num - 1 + this.anzahl_partikel) % this.anzahl_partikel;
+    this.current_form[i] = this.gesamt_partikel[preceding];
   }
 
   this.pushLast = function() {
