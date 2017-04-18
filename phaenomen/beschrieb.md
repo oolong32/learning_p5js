@@ -18,6 +18,8 @@ Man könnte sagen, ein Phänomen wählt sich bei seiner Entstehung eine gewisse 
 
 **Das Phänomen erhält seine Form durch die Position der Partikel, an denen seine „Knoten“ verankert sind.**
 
+Bezeichnung für Partikel, an denen ein Knoten ankert: *Host*. (Vielleicht gäbe es geeignetere, deutsche Begriffe.)
+
 ### Verwandlung in anderes Phänomen
 
 Eine Phänomen kann zu einem anderen Phänomen werden (genannt *Zielphänomen*. Um diesen Prozess zu verstehen, muss man Folgendes bedenken: Phänomene unterscheiden sich durch zwei Eigenschaften:
