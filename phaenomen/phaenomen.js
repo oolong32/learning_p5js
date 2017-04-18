@@ -16,9 +16,15 @@ function Phenomenon(p_list, num) {
                             // ist hier von Interesse: Diese Listen werden nicht beeinflusst
                             // von wax/wane. all das betrifft nur 'current_hosts'
 
-  this.current_hosts = [];   // wird gebraucht, damit die ursprüngliche
-  // Form des Phänomens unverändert bleibt, auch wenn sich das Phänomen
-  // der Form eines 'Zielphänomens' annähert (wax/wane).
+  this.current_hosts = [];  // wird gebraucht, damit die ursprüngliche
+                            // Form des Phänomens unverändert bleibt, auch wenn sich das Phänomen
+                            // der Form eines 'Zielphänomens' annähert (wax/wane).
+  
+  this.growing_node = null; // hier wird, so lange (this.wax == true) ein Objekt gespeichert,
+                            // mit 'temporärem Hosts' (die Hosts, an denen sich der wachsende Knoten entlangbewegt)
+                            // und mit der Position (num) des Zielpartikels
+                            // sobald dieses Partikel erreicht ist, wird es in die current_hosts geschrieben und
+                            // die Variable growing_node wird wieder auf null gesetzt.
 
   this.initialize = function() {
     // choose active Particle’s indexes
