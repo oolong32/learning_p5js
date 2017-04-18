@@ -94,7 +94,6 @@ function Phenomenon(p_list, num) {
       return null;
 
     } else { // es gibt noch Lücken zwischen den Knoten
-      // Wachstum beginnt
 
       var gap = big_gap[1];
 
@@ -113,10 +112,6 @@ function Phenomenon(p_list, num) {
         // die sichtbare Form erhält einen neuen Knoten, der im Moment noch
         // am gleichen Ort ankert  wie sein vorhergehender Nachbar
         var new_index = big_gap[2] + 1 % this.current_hosts.length;
-        console.log("create new node at index: " + new_index);
-        console.log(" ist das unter 12?");
-        console.log(this.growing_node["temp_host"])
-        console.log("na?");
         this.current_hosts.splice(new_index, 0, this.gesamt_partikel[this.growing_node["temp_host"]]);
         this.growing_node["pos_in_nodes"] = new_index; // wir müssen im auge behalten, welchen index der neue knoten hat
       }
@@ -135,6 +130,7 @@ function Phenomenon(p_list, num) {
       } else { // new_node ist noch unterwegs
         console.log("moving new node at index: " + this.growing_node["pos_in_nodes"]);
         this.replaceHostRight(this.growing_node["pos_in_nodes"]);
+        console.log("temporary host was: " + this.growing_node["temp_host"]);
         this.growing_node["temp_host"] = this.current_hosts[this.growing_node["pos_in_nodes"]].num; // ev. besser die num des Hosts abzufragen? was ist mit modulo?
         // this.wax bleibt true
         return null;
@@ -209,7 +205,7 @@ function Phenomenon(p_list, num) {
   };
 
   this.replaceHostRight = function(i) { // ‘moves’ node at index i one space cw
-    var succeeding = this.current_hosts[i].num + 1 % this.anzahl_partikel;
+    var succeeding = (this.current_hosts[i].num + 1) % this.anzahl_partikel;
     this.current_hosts[i] = this.gesamt_partikel[succeeding];
   };
 
