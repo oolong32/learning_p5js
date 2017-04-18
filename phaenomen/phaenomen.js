@@ -7,7 +7,7 @@ function Phenomenon(p_list, num) {
   this.wane = false;
   this.wax = false;
 
-  this.nodes = [];    // bis auf Weiteres zufällige Auswahl
+  this.nodes = [];    // bis auf Weiteres zufällige Auswahl aus Partikeln
 
   // Partikel, Host/Frei
   this.host_partikel = [];  // Auswahl aus p_list: Hier ankern die Knoten
@@ -91,6 +91,7 @@ function Phenomenon(p_list, num) {
     if (!big_gap) { // es sind keine Lücken mehr frei
       console.log("no mo’ gaps, yo!");
       this.wax = false;
+      this.growing_node = null; // this.growing_node zurücksetzen
       return null;
 
     } else { // es gibt noch Lücken zwischen den Knoten
@@ -119,18 +120,16 @@ function Phenomenon(p_list, num) {
 
       if (this.growing_node["temp_host"] === this.growing_node["target_particle"]) { // temp_host stimmt mit target_particle überein
 
-      // Wachstum beendet
-      console.log("finished growing");
-      this.wax = false;
-      
-      // Behälter für neuen Knoten leeren
-      this.growing_node = null;
-      return null;
+        // Wachstum beendet
+        console.log("finished growing");
+        this.wax = false;
+        
+        // Behälter für neuen Knoten leeren
+        this.growing_node = null;
+        return null;
 
       } else { // new_node ist noch unterwegs
-        console.log("moving new node at index: " + this.growing_node["pos_in_nodes"]);
         this.replaceHostRight(this.growing_node["pos_in_nodes"]);
-        console.log("temporary host was: " + this.growing_node["temp_host"]);
         this.growing_node["temp_host"] = this.current_hosts[this.growing_node["pos_in_nodes"]].num; // ev. besser die num des Hosts abzufragen? was ist mit modulo?
         // this.wax bleibt true
         return null;
