@@ -52,3 +52,11 @@ Sinkt sie, so werden die beiden am nächsten beieinanderliegenden Knoten zusamme
 #### Übergang vom Ausgangsphänomen zum Zielphänomen
 
 …
+
+### Das sichtbare Phänomen
+
+Das Phänomen hat eine *Repräsentation*, seine *sichtbare Form*. Diese Repräsentation hängt insofern von der Beschaffenheit der Partikel ab, als dass (zu diesem Zeitpunkt) nicht das Phänomen an sich abgebildet wird, sondern dass Partikel hervorgehoben werden, die Knoten beherbergen. Dies kann sich noch ändern, erlaubt aber die Trennung zwischen Struktur und Repräsentation.
+
+Die sichtbare Form ändert sich überdies während einer Verwandlung: Knoten bewegen sich einer Reihe von Partikeln entlang, bis sie an einer neuen Position zur Ruhe kommen oder bis sie von einem anderen Knoten absorbiert werden.
+
+Die Repräsentation eines Phänomens ist nicht das Phänomen, sondern eine flüchtige Erscheinung, die auf das Phänomen verweist, es aber nicht tangiert.
