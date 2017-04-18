@@ -20,11 +20,11 @@ function Phenomenon(p_list, num) {
                             // Form des Phänomens unverändert bleibt, auch wenn sich das Phänomen
                             // der Form eines 'Zielphänomens' annähert (wax/wane).
   
-  this.growing_node = null; // hier wird, so lange (this.wax == true) ein Objekt gespeichert,
-                            // mit 'temporärem Hosts' (die Hosts, an denen sich der wachsende Knoten entlangbewegt)
-                            // und mit der Position (num) des Zielpartikels
-                            // sobald dieses Partikel erreicht ist, wird es in die current_hosts geschrieben und
-                            // die Variable growing_node wird wieder auf null gesetzt.
+  this.growing_node =  null; // hier wird, so lange (this.wax == true) ein Objekt gespeichert,
+                             // mit 'temporärem Hosts' (die Hosts, an denen sich der wachsende Knoten entlangbewegt)
+                             // und mit der Position (num) des Zielpartikels
+                             // sobald dieses Partikel erreicht ist, wird es in die current_hosts geschrieben und
+                             // die Variable growing_node wird wieder auf null gesetzt.
 
   this.initialize = function() {
     // choose active Particle’s indexes
@@ -87,11 +87,15 @@ function Phenomenon(p_list, num) {
 
   this.pushNode = function() {
     var big_gap = this.findBigGap(); // call the function only once and leave it alone
-    if (!big_gap) {
+
+    if (!big_gap) { // es sind keine Lücken mehr frei
       console.log("no mo’ gaps, yo!");
       this.wax = false;
       return null;
-    } else {
+
+    } else { // es gibt noch Lücken zwischen den Knoten
+      // Wachstum beginnt
+
       var gap = big_gap[1];
 
       var pos_left_node = big_gap[0].num;
@@ -99,23 +103,40 @@ function Phenomenon(p_list, num) {
       var step = Math.floor(gap / 2);
       var pos_new_node = (pos_left_node + step) % this.anzahl_partikel;
 
-      if (gap > 1) {
-        // neuer node auf pos. left_node + 1 (in nodes reinspleissen)
-        // letztendlich möchten wir, dass nicht einfach nur einer dazu kommt, sondern, dass er sich in die mitte o.ä. bewegt
-        if (this.current_hosts.length > 1) {
-          this.current_hosts.splice(big_gap[2] + 1 % this.current_hosts.length, 0, this.gesamt_partikel[(pos_left_node + 1) % this.anzahl_partikel]);
-        } else { // only one node left
-          this.current_hosts.push(this.gesamt_partikel[(this.current_hosts[0].num + 1) % this.anzahl_partikel]);
-        }
-        // dann rauf, rauf rauf.
-        // bis pos_neuer_node == pos_new_node
-        this.wax = false;
-        return null;
 
-      } else { // what is this case doing? any use at all?
-        console.log("ooooh, what is this?");
-        // delete this block?
-        this.wax = false;
+      if (!this.growing_node) {
+        // neuen Knoten initialisieren 
+        this.growing_node = {};
+        this.growing_node["temp_host"] = pos_left_node;
+        this.growing_node["target_particle"] = pos_new_node;
+    
+        // die sichtbare Form erhält einen neuen Knoten, der im Moment noch
+        // am gleichen Ort ankert  wie sein vorhergehender Nachbar
+        var new_index = big_gap[2] + 1 % this.current_hosts.length;
+        console.log("create new node at index: " + new_index);
+        console.log(" ist das unter 12?");
+        console.log(this.growing_node["temp_host"])
+        console.log("na?");
+        this.current_hosts.splice(new_index, 0, this.gesamt_partikel[this.growing_node["temp_host"]]);
+        this.growing_node["pos_in_nodes"] = new_index; // wir müssen im auge behalten, welchen index der neue knoten hat
+      }
+
+
+      if (this.growing_node["temp_host"] === this.growing_node["target_particle"]) { // temp_host stimmt mit target_particle überein
+
+      // Wachstum beendet
+      console.log("finished growing");
+      this.wax = false;
+      
+      // Behälter für neuen Knoten leeren
+      this.growing_node = null;
+      return null;
+
+      } else { // new_node ist noch unterwegs
+        console.log("moving new node at index: " + this.growing_node["pos_in_nodes"]);
+        this.replaceHostRight(this.growing_node["pos_in_nodes"]);
+        this.growing_node["temp_host"] = this.current_hosts[this.growing_node["pos_in_nodes"]].num; // ev. besser die num des Hosts abzufragen? was ist mit modulo?
+        // this.wax bleibt true
         return null;
       }
     }
