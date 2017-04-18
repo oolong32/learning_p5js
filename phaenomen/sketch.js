@@ -1,7 +1,7 @@
 var particles;
 var phenomenon;
-var shrink_button;
-var grow_button;
+var wane_button;
+var wax_button;
 
 function setup() {
   // pixelDensity(1.0);
@@ -12,9 +12,9 @@ function setup() {
   // by drawing on a circle
 
   particles = [];
-  var numP = 40;
+  var numP = 12;
   var step = 360 / numP;
-  var num = 0; // each particle will get a number
+  var num = 0; // each particle gets a number
   for (var i = 0; i < 360; i += step) {
     var a = radians(i);
     var x = cos(a);
@@ -27,29 +27,29 @@ function setup() {
     num += 1;
   }
   // bis auf Weiteres:
-  // Phaenomenon besteht aus zufälliger Auswahl aus verfügbaren Partikeln.
+  // Phaenomenon besteht aus zufälliger
+  // Auswahl verfügbarer Partikel.
   phenomenon = new Phenomenon(particles, 7);
   phenomenon.initialize();
-  phenomenon.findSmallestGap();
-  phenomenon.findBiggestGap();
+  phenomenon.findSmallGap();
+  phenomenon.findBigGap();
 
-  // buttons (testweise)
-  // bedenke: wir wollen nicht einfach vergrössern/-kleinern,
-  // sondern von einem objekt zum anderen wechseln.
-  shrink_button = createButton('shrink');
-  grow_button = createButton('grow');
-  shrink_button.mousePressed(wane);
-  grow_button.mousePressed(wax);
-  
-
+  // Buttons (testweise)
+  // bedenke: wir wollen nicht nur
+  // vergrössern/-kleinern, sondern von
+  // einem Phänomen zum anderen wechseln.
+  wane_button = createButton('wane');
+  wax_button = createButton('wax');
+  wane_button.mousePressed(wanePhenomenon);
+  wax_button.mousePressed(waxPhenomenon);
 }
 
-function wax() {
-  phenomenon.grow = true;
+function waxPhenomenon() {
+  phenomenon.wax = true;
 }
 
-function wane() {
-  phenomenon.shrink = true;
+function wanePhenomenon() {
+  phenomenon.wane = true;
 }
 
 function draw() {
@@ -61,13 +61,18 @@ function draw() {
     particles[i].repraesentieren();
   }
   phenomenon.display("yes");
-  if (phenomenon.shrink === true) { // wahrscheinlich wärs gescheiter diese bedingung im objekt unterzubringen?
-    phenomenon.reducePhenomeon();
+  if (phenomenon.wane === true) { // wahrsch.
+    // wärs gescheiter, diese bedingung im
+    // objekt unterzubringen?
+    phenomenon.pullNode();
+  }
+
+  if (phenomenon.wax === true) {
+    phenomenon.pushNode();
   }
   // works :-)
   // todo: das selbe für zusätzliche partikel:
-  // - wie müssen die punkte verschoben werden, um mit denen des nächsten partikels übereinzustimmen?
-  // dann: umschalten zwischen zwei partikeln
-  // dann: umschalten zwischen vielen partikeln
-  // dann: bildsprache?
+  // - wie müssen die Knoten verschoben werden,
+  // um mit denen des nächsten Phänomens übereinzustimmen?
+  // dann: umschalten zwischen vielen Phänomenen
 }
