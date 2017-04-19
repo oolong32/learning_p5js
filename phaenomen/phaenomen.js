@@ -19,7 +19,7 @@ function Phenomenon(p_list, num) {
   this.current_hosts = [];  // wird gebraucht, damit die ursprüngliche
                             // Form des Phänomens unverändert bleibt, auch wenn sich das Phänomen
                             // der Form eines 'Zielphänomens' annähert (wax/wane).
-  
+
   this.growing_node =  null; // hier wird, so lange (this.wax == true) ein Objekt gespeichert,
                              // mit 'temporärem Hosts' (die Hosts, an denen sich der wachsende Knoten entlangbewegt)
                              // und mit der Position (num) des Zielpartikels
@@ -96,15 +96,15 @@ function Phenomenon(p_list, num) {
 
     } else { // es gibt noch Lücken zwischen den Knoten
 
-      var gap = big_gap[1];
-
-      var pos_left_node = big_gap[0].num;
-      var pos_right_node = (pos_left_node + gap) % this.anzahl_partikel;
-      var step = Math.floor(gap / 2);
-      var pos_new_node = (pos_left_node + step) % this.anzahl_partikel;
-
-
       if (!this.growing_node) {
+        // alles was die Lücke betrifft
+        var gap = big_gap[1];
+        var pos_left_node = big_gap[0].num;
+        var pos_right_node = (pos_left_node + gap) % this.anzahl_partikel;
+        // var step = Math.floor(gap / 2); // in der Mitte
+        var step = Math.floor(Math.random() * (gap - 1) + 1); // irgendwo dazwischen
+        console.log(step);
+        var pos_new_node = (pos_left_node + step) % this.anzahl_partikel;
         // neuen Knoten initialisieren 
         this.growing_node = {};
         this.growing_node["temp_host"] = pos_left_node;
