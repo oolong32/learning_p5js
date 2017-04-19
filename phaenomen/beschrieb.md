@@ -45,6 +45,8 @@ Steigt sie, so wird zwischen den am weitesten voneinander entfernten Knoten ein 
 
 Sinkt sie, so werden die beiden am nächsten beieinanderliegenden Knoten zusammengeführt. Sobald sie sich überlagern, wird der zweite Knoten gelöscht. Dieser Prozess wird als *Abnehmen* (engl. ‘wane’) bezeichnet.
 
+Anm. Nicola: Vielleicht ist es nicht nötig, jew. 1:1 auf die Zielform einzugehen, bzw. könnte die Zielform davon abhängig sein, wie die Knoten zugefügt bzw. entfernt werden.
+
 #### Ausrichten der Knoten
 
 …

@@ -5,24 +5,24 @@ var wax_button;
 
 function setup() {
   // pixelDensity(1.0);
-  createCanvas(500, 400);
-  frameRate(5);
+  createCanvas(500, 500);
+  // frameRate(5);
 
   // create a couple of particles
   // by drawing on a circle
 
   particles = [];
-  var numP = 12;
+  var numP = 80;
   var step = 360 / numP;
   var num = 0; // each particle gets a number
   for (var i = 0; i < 360; i += step) {
     var a = radians(i);
     var x = cos(a);
     var y = sin(a);
-    var m = 80; // magnitude
+    var m = 220; // magnitude
     var v = createVector(x, y);
     v.mult(m);
-    var p = new Partikel(num, v, 13);
+    var p = new Partikel(num, v, 20);
     particles.push(p);
     num += 1;
   }
