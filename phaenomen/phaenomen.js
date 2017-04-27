@@ -68,14 +68,8 @@ function Phenomenon(p_list, num) {
       for (var n = 0; n < this.nodes.length; n++) {
         if (i === this.nodes[n]) { // die Zahlen in this.nodes sind nicht aufsteigend, sondern durcheinander!
           console.log(i);
-          this.original_hosts.push(i); // hier sollte nur i genommen werden, statt das ganze Objekt
-          // !!!!
-          // !!!!
-          // vvvv
-          this.current_hosts.push(i); // hier sollte nur i genommen werden, statt das ganze Objekt
-          // ^^^^
-          // !!!!
-          // !!!!
+          this.original_hosts.push(i);
+          this.current_hosts.push(i);
           found = true;
           break;
         }
@@ -136,15 +130,7 @@ function Phenomenon(p_list, num) {
         // die sichtbare Form erhält einen neuen Knoten, der im Moment noch
         // am gleichen Ort ankert  wie sein vorhergehender Nachbar
         var new_index = big_gap[2] + 1 % this.current_hosts.length;
-        // hier wird ein Objekt gespeichert ---------------------------------------------------------------------- Baustelle Good Riddance
-        // hier wird ein Objekt gespeichert ---------------------------------------------------------------------- Baustelle Good Riddance
-        // wahrsch. kein Problem, muss einfach beizeiten geändert werden.
-        // hier wird ein Objekt gespeichert ---------------------------------------------------------------------- Baustelle Good Riddance
-        // muss am Ende nur heissen .num – oder?
         this.current_hosts.splice(new_index, 0, this.listAllParticles()[this.growing_node["temp_host"]].num);
-        // hier wird ein Objekt gespeichert ---------------------------------------------------------------------- Baustelle Good Riddance
-        // hier wird ein Objekt gespeichert ---------------------------------------------------------------------- Baustelle Good Riddance
-        // hier wird ein Objekt gespeichert ---------------------------------------------------------------------- Baustelle Good Riddance
         this.growing_node["pos_in_nodes"] = new_index; // wir müssen im auge behalten, welchen index der neue knoten hat
       }
 
@@ -160,15 +146,7 @@ function Phenomenon(p_list, num) {
 
       } else { // new_node ist noch unterwegs
         this.replaceHostRight(this.growing_node["pos_in_nodes"]);
-        // scheint einfach weil es schon um num geht ---------------------------------------------------------------------- Baustelle Good Riddance
-        // scheint einfach weil es schon um num geht ---------------------------------------------------------------------- Baustelle Good Riddance
-        // scheint einfach weil es schon um num geht ---------------------------------------------------------------------- Baustelle Good Riddance
-        // also einfach .num streichen? -- scheint so.
         this.growing_node["temp_host"] = this.current_hosts[this.growing_node["pos_in_nodes"]];
-        // scheint einfach weil es schon um num geht ---------------------------------------------------------------------- Baustelle Good Riddance
-        // scheint einfach weil es schon um num geht ---------------------------------------------------------------------- Baustelle Good Riddance
-        // scheint einfach weil es schon um num geht ---------------------------------------------------------------------- Baustelle Good Riddance
-        //
         // this.wax bleibt true
         return null;
       }
@@ -185,33 +163,11 @@ function Phenomenon(p_list, num) {
       if (this.current_hosts.length > 1) {
         for (var n = 0; n < this.current_hosts.length; n++) {
           var next_host = (n + 1) % this.current_hosts.length;
-          // hier wird auf die .num eines objekts aus current hosts referenziert – anpassen -------------------------Baustelle Good Riddance
-          // hier wird auf die .num eines objekts aus current hosts referenziert – anpassen -------------------------Baustelle Good Riddance
-          // hier wird auf die .num eines objekts aus current hosts referenziert – anpassen -------------------------Baustelle Good Riddance
           var gap = (this.current_hosts[next_host] + this.anzahl_partikel - this.current_hosts[n]) % this.anzahl_partikel;
-          // hier wird auf die .num eines objekts aus current hosts referenziert – anpassen -------------------------Baustelle Good Riddance
-          // hier wird auf die .num eines objekts aus current hosts referenziert – anpassen -------------------------Baustelle Good Riddance
-          // hier wird auf die .num eines objekts aus current hosts referenziert – anpassen -------------------------Baustelle Good Riddance
-          // hier wird auf die .num eines objekts aus current hosts referenziert – anpassen -------------------------Baustelle Good Riddance
-
-          // hier wird NICHT MEHR ein Objekt gespeichert ---------------------------------------------------------------------- Baustelle Good Riddance
-          // hier wird NICHT MEHR ein Objekt gespeichert ---------------------------------------------------------------------- Baustelle Good Riddance
-          // hier wird NICHT MEHR ein Objekt gespeichert ---------------------------------------------------------------------- Baustelle Good Riddance
           gaps.push([this.current_hosts[n], gap, n]);
-          // hier wird NICHT MEHR ein Objekt gespeichert ---------------------------------------------------------------------- Baustelle Good Riddance
-          // hier wird NICHT MEHR ein Objekt gespeichert ---------------------------------------------------------------------- Baustelle Good Riddance
-          // hier wird NICHT MEHR ein Objekt gespeichert ---------------------------------------------------------------------- Baustelle Good Riddance
         }
       } else {
-        // hier wird NICHT MEHR ein Objekt gespeichert ---------------------------------------------------------------------- Baustelle Good Riddance
-        // hier wird NICHT MEHR ein Objekt gespeichert ---------------------------------------------------------------------- Baustelle Good Riddance
-        // hier wird NICHT MEHR ein Objekt gespeichert ---------------------------------------------------------------------- Baustelle Good Riddance
         gaps.push([this.current_hosts[0], this.anzahl_partikel - 1, 0]);
-        // an was wird das übergeben?
-        // wird da etwas anderes gebraucht als index/num dieses objekts?
-        // hier wird NICHT MEHR ein Objekt gespeichert ---------------------------------------------------------------------- Baustelle Good Riddance
-        // hier wird NICHT MEHR ein Objekt gespeichert ---------------------------------------------------------------------- Baustelle Good Riddance
-        // hier wird NICHT MEHR ein Objekt gespeichert ---------------------------------------------------------------------- Baustelle Good Riddance
       }
       return gaps;
     } else {
@@ -224,18 +180,10 @@ function Phenomenon(p_list, num) {
     var gaps = this.listGaps();
     if (!gaps) { // no gaps, which one to reduce?
       var random_host = Math.floor(Math.random() * this.current_hosts.length); 
-      // hier wird eine zufällige Position in this.current_hosts gewählt ------------------------------------------ Baustelle Good Riddance
-      // hier wird eine zufällige Position in this.current_hosts gewählt ------------------------------------------ Baustelle Good Riddance
-      // hier wird eine zufällige Position in this.current_hosts gewählt ------------------------------------------ Baustelle Good Riddance
-      // eher unroblematisch, was?
-      // wo kommt das zum Einsatz? die Funktion findSmallGap gibt ein Objekt zurück!!!!!!!!!!!!
       var smallest_gap = [this.current_hosts[random_host], 0, random_host];
-      // hier wird eine zufällige Position in this.current_hosts gewählt ------------------------------------------ Baustelle Good Riddance
-      // hier wird eine zufällige Position in this.current_hosts gewählt ------------------------------------------ Baustelle Good Riddance
-      // hier wird eine zufällige Position in this.current_hosts gewählt ------------------------------------------ Baustelle Good Riddance
     } else { // there are gaps, let’s compare
       var smallest_gap = gaps.reduce(function(curr, next) {
-        if (curr[1] <= next[1]) { // <----------------------------------------wahrsch. kein Problem, aber prüfen -- Baustelle Good Riddance
+        if (curr[1] <= next[1]) {
           return curr;
         } else {
           return next;
@@ -253,7 +201,7 @@ function Phenomenon(p_list, num) {
     }
     if (gaps.length > 1) {
       var biggest_gap = gaps.reduce(function(curr, next) {
-        if (curr[1] >= next[1]) { // <-------------------------------------wahrsch. kein Problem, aber prüfen -- Baustelle Good Riddance
+        if (curr[1] >= next[1]) {
           return curr;
         } else {
           return next;
@@ -267,53 +215,20 @@ function Phenomenon(p_list, num) {
 
   this.replaceHostLeft = function(i) { // ‘moves’ node at index i one space ccw
     // Modulo verhindert Probleme am Nullpunkt
-    // unproblematisch, weil es hier bereits um num geht – so sollte es überall sein --------------------------------- Baustelle Good Riddance
-    // unproblematisch, weil es hier bereits um num geht – so sollte es überall sein --------------------------------- Baustelle Good Riddance
-    // unproblematisch, weil es hier bereits um num geht – so sollte es überall sein --------------------------------- Baustelle Good Riddance
     var preceding = (this.current_hosts[i] - 1 + this.anzahl_partikel) % this.anzahl_partikel;
-    // unproblematisch, weil es hier bereits um num geht – so sollte es überall sein --------------------------------- Baustelle Good Riddance
-    // unproblematisch, weil es hier bereits um num geht – so sollte es überall sein --------------------------------- Baustelle Good Riddance
-    // unproblematisch, weil es hier bereits um num geht – so sollte es überall sein --------------------------------- Baustelle Good Riddance
-
-    // hier hingegen … wird ein Objekt übergeben --------------------------------------------------------------------- Baustelle Good Riddance
-    // hier hingegen … wird ein Objekt übergeben --------------------------------------------------------------------- Baustelle Good Riddance
-    // hier hingegen … wird ein Objekt übergeben --------------------------------------------------------------------- Baustelle Good Riddance
-    this.current_hosts[i] = this.listAllParticles()[preceding].num;
-    // hier hingegen … wird ein Objekt übergeben --------------------------------------------------------------------- Baustelle Good Riddance
-    // hier hingegen … wird ein Objekt übergeben --------------------------------------------------------------------- Baustelle Good Riddance
-    // hier hingegen … wird ein Objekt übergeben --------------------------------------------------------------------- Baustelle Good Riddance
+    this.current_hosts[i] = preceding;
   };
 
   this.replaceHostRight = function(i) { // ‘moves’ node at index i one space cw
-    // unproblematisch, weil es hier bereits um num geht – so sollte es überall sein --------------------------------- Baustelle Good Riddance
-    // unproblematisch, weil es hier bereits um num geht – so sollte es überall sein --------------------------------- Baustelle Good Riddance
-    // unproblematisch, weil es hier bereits um num geht – so sollte es überall sein --------------------------------- Baustelle Good Riddance
     var succeeding = (this.current_hosts[i] + 1) % this.anzahl_partikel;
-    // unproblematisch, weil es hier bereits um num geht – so sollte es überall sein --------------------------------- Baustelle Good Riddance
-    // unproblematisch, weil es hier bereits um num geht – so sollte es überall sein --------------------------------- Baustelle Good Riddance
-    // unproblematisch, weil es hier bereits um num geht – so sollte es überall sein --------------------------------- Baustelle Good Riddance
-
-    // hier hingegen … wird ein Objekt übergeben --------------------------------------------------------------------- Baustelle Good Riddance
-    // hier hingegen … wird ein Objekt übergeben --------------------------------------------------------------------- Baustelle Good Riddance
-    // hier hingegen … wird ein Objekt übergeben --------------------------------------------------------------------- Baustelle Good Riddance
-    this.current_hosts[i] = this.listAllParticles()[succeeding].num;
-    // hier hingegen … wird ein Objekt übergeben --------------------------------------------------------------------- Baustelle Good Riddance
-    // hier hingegen … wird ein Objekt übergeben --------------------------------------------------------------------- Baustelle Good Riddance
-    // hier hingegen … wird ein Objekt übergeben --------------------------------------------------------------------- Baustelle Good Riddance
+    this.current_hosts[i] = succeeding;
   };
 
   this.display = function(option) {
     // draw active particles
     // if option is set, an ellipsis is drawn around particles
     for (var i = 0; i < this.current_hosts.length; i++) {
-
-      // das hier sollte nicht so kompliziert werden --------------------------------------------------------------------- Baustelle Good Riddance
-      // das hier sollte nicht so kompliziert werden --------------------------------------------------------------------- Baustelle Good Riddance
-      // das hier sollte nicht so kompliziert werden --------------------------------------------------------------------- Baustelle Good Riddance
       var das_partikel = this.listAllParticles()[this.current_hosts[i]];
-      // das hier sollte nicht so kompliziert werden --------------------------------------------------------------------- Baustelle Good Riddance
-      // das hier sollte nicht so kompliziert werden --------------------------------------------------------------------- Baustelle Good Riddance
-      // das hier sollte nicht so kompliziert werden --------------------------------------------------------------------- Baustelle Good Riddance
       das_partikel.repraesentieren(option);
     };
     
@@ -322,13 +237,7 @@ function Phenomenon(p_list, num) {
     stroke(255, 50, 0);
     beginShape();
     for (var i = 0; i < this.current_hosts.length; i++) {
-      // das hier sollte nicht so kompliziert werden --------------------------------------------------------------------- Baustelle Good Riddance
-      // das hier sollte nicht so kompliziert werden --------------------------------------------------------------------- Baustelle Good Riddance
-      // das hier sollte nicht so kompliziert werden --------------------------------------------------------------------- Baustelle Good Riddance
       var pos = this.listAllParticles()[this.current_hosts[i]].pos;
-      // das hier sollte nicht so kompliziert werden --------------------------------------------------------------------- Baustelle Good Riddance
-      // das hier sollte nicht so kompliziert werden --------------------------------------------------------------------- Baustelle Good Riddance
-      // das hier sollte nicht so kompliziert werden --------------------------------------------------------------------- Baustelle Good Riddance
       vertex(pos.x, pos.y);
     };
     endShape(CLOSE);
