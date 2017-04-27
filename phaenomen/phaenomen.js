@@ -90,7 +90,7 @@ function Phenomenon(p_list, num) {
     var small_gap = this.findSmallGap();
 
     var gap = small_gap[1];
-    var pos_left_node = small_gap[0].num;
+    var pos_left_node = small_gap[0];
     var pos_right_node = (pos_left_node + gap) % this.anzahl_partikel;
     if (this.current_hosts.length > 1) { // more than one node/host for phenomenon
       if (pos_right_node % this.anzahl_partikel != pos_left_node) { // left & right host distinct
@@ -124,7 +124,7 @@ function Phenomenon(p_list, num) {
       if (!this.growing_node) {
         // alles was die Lücke betrifft
         var gap = big_gap[1];
-        var pos_left_node = big_gap[0].num;
+        var pos_left_node = big_gap[0];
         var pos_right_node = (pos_left_node + gap) % this.anzahl_partikel;
         // var step = Math.floor(gap / 2); // in der Mitte
         var step = Math.floor(Math.random() * (gap - 1) + 1); // irgendwo dazwischen
@@ -140,6 +140,7 @@ function Phenomenon(p_list, num) {
         var new_index = big_gap[2] + 1 % this.current_hosts.length;
         // hier wird ein Objekt gespeichert ---------------------------------------------------------------------- Baustelle Good Riddance
         // hier wird ein Objekt gespeichert ---------------------------------------------------------------------- Baustelle Good Riddance
+        // wahrsch. kein Problem, muss einfach beizeiten geändert werden.
         // hier wird ein Objekt gespeichert ---------------------------------------------------------------------- Baustelle Good Riddance
         this.current_hosts.splice(new_index, 0, this.listAllParticles()[this.growing_node["temp_host"]]);
         // hier wird ein Objekt gespeichert ---------------------------------------------------------------------- Baustelle Good Riddance
@@ -184,19 +185,33 @@ function Phenomenon(p_list, num) {
       if (this.current_hosts.length > 1) {
         for (var n = 0; n < this.current_hosts.length; n++) {
           var next_host = (n + 1) % this.current_hosts.length;
+          // hier wird auf die .num eines objekts aus current hosts referenziert – anpassen -------------------------Baustelle Good Riddance
+          // hier wird auf die .num eines objekts aus current hosts referenziert – anpassen -------------------------Baustelle Good Riddance
+          // hier wird auf die .num eines objekts aus current hosts referenziert – anpassen -------------------------Baustelle Good Riddance
           var gap = (this.current_hosts[next_host].num + this.anzahl_partikel - this.current_hosts[n].num) % this.anzahl_partikel;
-          gaps.push([this.current_hosts[n], gap, n]);
+          // hier wird auf die .num eines objekts aus current hosts referenziert – anpassen -------------------------Baustelle Good Riddance
+          // hier wird auf die .num eines objekts aus current hosts referenziert – anpassen -------------------------Baustelle Good Riddance
+          // hier wird auf die .num eines objekts aus current hosts referenziert – anpassen -------------------------Baustelle Good Riddance
+          // hier wird auf die .num eines objekts aus current hosts referenziert – anpassen -------------------------Baustelle Good Riddance
+
+          // hier wird NICHT MEHR ein Objekt gespeichert ---------------------------------------------------------------------- Baustelle Good Riddance
+          // hier wird NICHT MEHR ein Objekt gespeichert ---------------------------------------------------------------------- Baustelle Good Riddance
+          // hier wird NICHT MEHR ein Objekt gespeichert ---------------------------------------------------------------------- Baustelle Good Riddance
+          gaps.push([this.current_hosts[n].num, gap, n]);
+          // hier wird NICHT MEHR ein Objekt gespeichert ---------------------------------------------------------------------- Baustelle Good Riddance
+          // hier wird NICHT MEHR ein Objekt gespeichert ---------------------------------------------------------------------- Baustelle Good Riddance
+          // hier wird NICHT MEHR ein Objekt gespeichert ---------------------------------------------------------------------- Baustelle Good Riddance
         }
       } else {
-        // hier wird ein Objekt gespeichert ---------------------------------------------------------------------- Baustelle Good Riddance
-        // hier wird ein Objekt gespeichert ---------------------------------------------------------------------- Baustelle Good Riddance
-        // hier wird ein Objekt gespeichert ---------------------------------------------------------------------- Baustelle Good Riddance
-        gaps.push([this.current_hosts[0], this.anzahl_partikel - 1, 0]);
+        // hier wird NICHT MEHR ein Objekt gespeichert ---------------------------------------------------------------------- Baustelle Good Riddance
+        // hier wird NICHT MEHR ein Objekt gespeichert ---------------------------------------------------------------------- Baustelle Good Riddance
+        // hier wird NICHT MEHR ein Objekt gespeichert ---------------------------------------------------------------------- Baustelle Good Riddance
+        gaps.push([this.current_hosts[0].num, this.anzahl_partikel - 1, 0]);
         // an was wird das übergeben?
         // wird da etwas anderes gebraucht als index/num dieses objekts?
-        // hier wird ein Objekt gespeichert ---------------------------------------------------------------------- Baustelle Good Riddance
-        // hier wird ein Objekt gespeichert ---------------------------------------------------------------------- Baustelle Good Riddance
-        // hier wird ein Objekt gespeichert ---------------------------------------------------------------------- Baustelle Good Riddance
+        // hier wird NICHT MEHR ein Objekt gespeichert ---------------------------------------------------------------------- Baustelle Good Riddance
+        // hier wird NICHT MEHR ein Objekt gespeichert ---------------------------------------------------------------------- Baustelle Good Riddance
+        // hier wird NICHT MEHR ein Objekt gespeichert ---------------------------------------------------------------------- Baustelle Good Riddance
       }
       return gaps;
     } else {
@@ -220,7 +235,7 @@ function Phenomenon(p_list, num) {
       // hier wird eine zufällige Position in this.current_hosts gewählt ------------------------------------------ Baustelle Good Riddance
     } else { // there are gaps, let’s compare
       var smallest_gap = gaps.reduce(function(curr, next) {
-        if (curr[1] <= next[1]) {
+        if (curr[1] <= next[1]) { // <----------------------------------------wahrsch. kein Problem, aber prüfen -- Baustelle Good Riddance
           return curr;
         } else {
           return next;
@@ -238,7 +253,7 @@ function Phenomenon(p_list, num) {
     }
     if (gaps.length > 1) {
       var biggest_gap = gaps.reduce(function(curr, next) {
-        if (curr[1] >= next[1]) {
+        if (curr[1] >= next[1]) { // <-------------------------------------wahrsch. kein Problem, aber prüfen -- Baustelle Good Riddance
           return curr;
         } else {
           return next;
