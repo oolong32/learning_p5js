@@ -1,24 +1,29 @@
 function Phenomenon(p_list, num) {
-  this.gesamt_partikel = p_list; // all particle objects
-  // wichtige Frage:
-  // ist das eine Kopie von p_list oder nicht?
 
-  this.anzahl_partikel = p_list.length;
+  this.anzahl_partikel = world.particles.length || 0; // Menge aller Partikel
   this.wane = false;
   this.wax = false;
 
-  this.nodes = [];    // bis auf Weiteres zufällige Auswahl aus Partikeln
+  this.nodes = [];
+  // bis auf Weiteres zufällige Auswahl aus Partikeln
+  // d.h. nur deren Index!
+  // Ich versuche, möglichst keine Objekte in den Phänomenen zu speichern
 
   // Partikel, Host/Frei
   this.host_partikel = [];  // Auswahl aus p_list: Hier ankern die Knoten
+                            // hier liegen im Moment Kopien der Objekte(Partikel).
+  // Ziel: nur ihren Index speichern
+
   this.freie_partikel = []; // Rest der p_list: Hier ankern keine Knoten
                             // Nebst der Frage, ob von 'Hosts' und 'Freien' gesprochen wird,
                             // ist hier von Interesse: Diese Listen werden nicht beeinflusst
                             // von wax/wane. all das betrifft nur 'current_hosts'
+  // Auch hier möchten wir nur Indexe haben, keine Objekte.
 
   this.current_hosts = [];  // wird gebraucht, damit die ursprüngliche
                             // Form des Phänomens unverändert bleibt, auch wenn sich das Phänomen
                             // der Form eines 'Zielphänomens' annähert (wax/wane).
+  // dito.
 
   this.growing_node =  null; // hier wird, so lange (this.wax == true) ein Objekt gespeichert,
                              // mit 'temporärem Hosts' (die Hosts, an denen sich der wachsende Knoten entlangbewegt)
@@ -51,14 +56,14 @@ function Phenomenon(p_list, num) {
       var found = false;
       for (var n = 0; n < this.nodes.length; n++) {
         if (i === this.nodes[n]) {
-          this.host_partikel.push(this.gesamt_partikel[i]);
-          this.current_hosts.push(this.gesamt_partikel[i]);
+          this.host_partikel.push(this.listAllParticles()[i]);
+          this.current_hosts.push(this.listAllParticles()[i]);
           found = true;
           break;
         }
       }
       if (!found) {
-        this.freie_partikel.push(this.gesamt_partikel[i]);
+        this.freie_partikel.push(this.listAllParticles()[i]);
       }
     }
   };
@@ -103,7 +108,7 @@ function Phenomenon(p_list, num) {
         var pos_right_node = (pos_left_node + gap) % this.anzahl_partikel;
         // var step = Math.floor(gap / 2); // in der Mitte
         var step = Math.floor(Math.random() * (gap - 1) + 1); // irgendwo dazwischen
-        console.log(step);
+        // console.log(step);
         var pos_new_node = (pos_left_node + step) % this.anzahl_partikel;
         // neuen Knoten initialisieren 
         this.growing_node = {};
@@ -113,7 +118,7 @@ function Phenomenon(p_list, num) {
         // die sichtbare Form erhält einen neuen Knoten, der im Moment noch
         // am gleichen Ort ankert  wie sein vorhergehender Nachbar
         var new_index = big_gap[2] + 1 % this.current_hosts.length;
-        this.current_hosts.splice(new_index, 0, this.gesamt_partikel[this.growing_node["temp_host"]]);
+        this.current_hosts.splice(new_index, 0, this.listAllParticles()[this.growing_node["temp_host"]]);
         this.growing_node["pos_in_nodes"] = new_index; // wir müssen im auge behalten, welchen index der neue knoten hat
       }
 
@@ -121,7 +126,7 @@ function Phenomenon(p_list, num) {
       if (this.growing_node["temp_host"] === this.growing_node["target_particle"]) { // temp_host stimmt mit target_particle überein
 
         // Wachstum beendet
-        console.log("finished growing");
+        // console.log("finished growing");
         this.wax = false;
         
         // Behälter für neuen Knoten leeren
@@ -200,12 +205,12 @@ function Phenomenon(p_list, num) {
   this.replaceHostLeft = function(i) { // ‘moves’ node at index i one space ccw
     // Modulo verhindert Probleme am Nullpunkt
     var preceding = (this.current_hosts[i].num - 1 + this.anzahl_partikel) % this.anzahl_partikel;
-    this.current_hosts[i] = this.gesamt_partikel[preceding];
+    this.current_hosts[i] = this.listAllParticles()[preceding];
   };
 
   this.replaceHostRight = function(i) { // ‘moves’ node at index i one space cw
     var succeeding = (this.current_hosts[i].num + 1) % this.anzahl_partikel;
-    this.current_hosts[i] = this.gesamt_partikel[succeeding];
+    this.current_hosts[i] = this.listAllParticles()[succeeding];
   };
 
   this.display = function(option) {
@@ -226,5 +231,31 @@ function Phenomenon(p_list, num) {
     };
     endShape(CLOSE);
     pop();
+  };
+
+  this.listAllParticles = function() {
+    if (!world.particles) {
+      console.log("world not ready, what!");
+      return null;
+    } else {
+      return world.particles;
+    }
+  };
+
+  this.listCurrentHosts = function() { // liste der Partikel, die einen Knoten des repräsentierten Phänomens beherbergen
+    var curHosts;
+    var particles = this.listAllParticles();
+    if (!particles) {
+      console.log(particles);
+      curHosts = null;
+    } else {
+      curHosts = [];
+      for (var i = 0; i < this.nodes.length; i++) {
+        var index = this.nodes[i];
+        var currentHost = particles[index];
+        curHosts.push(currentHost);
+      }
+    }
+    return curHosts;
   };
 }
