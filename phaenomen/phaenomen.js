@@ -1,11 +1,4 @@
-function Phenomenon(p_list, num) {
-  //
-  // =========================
-  // = Projekt Good Riddance =
-  // =========================
-  // Ziel: p_list wird obsolet.
-  // keine Objekte/Partikel in Phänomenen speichern.
-
+function Phenomenon(num) {
   this.anzahl_partikel = world.particles.length || 0; // Menge aller Partikel
   this.wane = false;
   this.wax = false;
@@ -23,18 +16,10 @@ function Phenomenon(p_list, num) {
                             // ist hier von Interesse: Diese Listen werden nicht beeinflusst
                             // von wax/wane. All dies betrifft nur 'current_hosts'.
 
-  // ===========================
-  // this.current_hosts enthält Objekte.
-  // ===========================
-  // Plan: alle Methoden, die this.current_hosts enthalten so umbauen, dass sie mit Index statt Objekt arbeiten, 
-  // dann alles ersetzen. ungefähr so: this.bla.bla.bla.num -> this.current_hosts[x]
+  this.current_hosts = [];  // Indexe der Hosts der sichtbaren Repräsentation des Phänomens (gäll)
+                            // wird gebraucht, damit die ursprüngliche Form des Phänomens unverändert bleibt,
+                            // auch wenn sich das Phänomen der Form eines 'Zielphänomens' annähert (wax/wane).
 
-  this.current_hosts = [];  // wird gebraucht, damit die ursprüngliche
-                            // Form des Phänomens unverändert bleibt, auch wenn sich das Phänomen
-                            // der Form eines 'Zielphänomens' annähert (wax/wane).
-
-  // auch hier nur Index speichern!
-  // oder ist das bereits der Fall? <----------------------------------------------------------------------------------- Baustelle Good Riddance
   this.growing_node =  null; // hier wird, so lange (this.wax == true) ein Objekt gespeichert,
                              // mit 'temporärem Hosts' (die Hosts, an denen sich der wachsende Knoten entlangbewegt)
                              // und mit der Position (num) des Zielpartikels

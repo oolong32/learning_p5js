@@ -25,7 +25,7 @@ function World(particles, phenomena) {
     // Phaenomenon besteht aus zufälliger
     // Auswahl verfügbarer Partikel.
     for (var i = 0; i < this.num_phenomena; i++) {
-      var phenomenon = new Phenomenon(this.particles, (i+1) * 3);
+      var phenomenon = new Phenomenon((i+1) * 3);
       phenomenon.initialize();
       this.phenomena.push(phenomenon);
     }
