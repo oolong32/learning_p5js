@@ -16,15 +16,16 @@ function Phenomenon(num) {
                             // ist hier von Interesse: Diese Listen werden nicht beeinflusst
                             // von wax/wane. All dies betrifft nur 'current_hosts'.
 
-  this.current_hosts = [];  // Indexe der Hosts der sichtbaren Repräsentation des Phänomens (gäll)
-                            // wird gebraucht, damit die ursprüngliche Form des Phänomens unverändert bleibt,
-                            // auch wenn sich das Phänomen der Form eines 'Zielphänomens' annähert (wax/wane).
+  this.current_hosts = [];  // Indexe der Hosts der sichtbaren Repräsentation des Phänomens.
+                            // wird gebraucht, damit die ursprüngliche Form des Phänomens
+                            // unverändert bleibt, auch wenn sich das Phänomen der Form eines
+                            // 'Zielphänomens' annähert (wax/wane).
 
   this.growing_node =  null; // hier wird, so lange (this.wax == true) ein Objekt gespeichert,
-                             // mit 'temporärem Hosts' (die Hosts, an denen sich der wachsende Knoten entlangbewegt)
-                             // und mit der Position (num) des Zielpartikels
-                             // sobald dieses Partikel erreicht ist, wird es in die current_hosts geschrieben und
-                             // die Variable growing_node wird wieder auf null gesetzt.
+                             // mit 'temporärem Hosts', an denen sich der wachsende Knoten
+                             // entlangbewegt und mit der Position (num) des Zielpartikels
+                             // sobald dieses Partikel erreicht ist, wird es in die current_hosts
+                             // geschrieben und die Variable growing_node wieder auf null gesetzt.
 
   this.initialize = function() {
     // choose active Particle’s indexes
@@ -51,7 +52,7 @@ function Phenomenon(num) {
     for (var i = 0; i < this.anzahl_partikel; i++) {
       var found = false;
       for (var n = 0; n < this.nodes.length; n++) {
-        if (i === this.nodes[n]) { // die Zahlen in this.nodes sind nicht aufsteigend, sondern durcheinander!
+        if (i === this.nodes[n]) {
           console.log(i);
           this.original_hosts.push(i);
           this.current_hosts.push(i);
@@ -116,10 +117,10 @@ function Phenomenon(num) {
         // am gleichen Ort ankert  wie sein vorhergehender Nachbar
         var new_index = big_gap[2] + 1 % this.current_hosts.length;
         this.current_hosts.splice(new_index, 0, this.listAllParticles()[this.growing_node["temp_host"]].num);
-        this.growing_node["pos_in_nodes"] = new_index; // wir müssen im auge behalten, welchen index der neue knoten hat
+        this.growing_node["pos_in_nodes"] = new_index; // Welchen Index hat der neue Knoten?
       }
 
-      if (this.growing_node["temp_host"] === this.growing_node["target_particle"]) { // temp_host stimmt mit target_particle überein
+      if (this.growing_node["temp_host"] === this.growing_node["target_particle"]) {
 
         // Wachstum beendet
         // console.log("finished growing");
@@ -229,6 +230,7 @@ function Phenomenon(num) {
     pop();
   };
 
+  // Liste aller existierenden Partikel
   this.listAllParticles = function() {
     if (!world.particles) {
       console.log("world not ready, what!");
@@ -238,7 +240,9 @@ function Phenomenon(num) {
     }
   };
 
-  this.listCurrentHosts = function() { // liste der Partikel, die einen Knoten des repräsentierten Phänomens beherbergen
+  // Liste der Partikel, die einen Knoten des
+  // repräsentierten Phänomens beherbergen
+  this.listCurrentHosts = function() {
     var curHosts;
     var particles = this.listAllParticles();
     if (!particles) {
