@@ -30,8 +30,9 @@ function draw() {
   background(0);
   translate(width/2, height/2);
 
-  world.displayPhenomena();
+  world.positionParticles();
   world.displayParticles();
+  world.displayPhenomena();
 
   if (world.active_phenomenon.wane === true) { // wahrsch.
     // wärs gescheiter, diese bedingung im
