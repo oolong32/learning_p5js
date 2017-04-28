@@ -53,7 +53,6 @@ function Phenomenon(num) {
       var found = false;
       for (var n = 0; n < this.nodes.length; n++) {
         if (i === this.nodes[n]) {
-          console.log(i);
           this.original_hosts.push(i);
           this.current_hosts.push(i);
           found = true;
@@ -246,7 +245,7 @@ function Phenomenon(num) {
     var curHosts;
     var particles = this.listAllParticles();
     if (!particles) {
-      console.log(particles);
+      // console.log(particles);
       curHosts = null;
     } else {
       curHosts = [];
