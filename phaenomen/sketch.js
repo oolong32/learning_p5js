@@ -7,7 +7,9 @@ function setup() {
   createCanvas(500, 500);
   // frameRate(5);
   
-  world = new World(70, 3);
+  var particles = 70;
+  var phenomena = 3;
+  world = new World(particles, phenomena);
   world.initialize();
 
   // Buttons (testweise) bedenke: wir wollen nicht nur
