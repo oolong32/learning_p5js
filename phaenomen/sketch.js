@@ -10,23 +10,17 @@ function setup() {
   world = new World(70, 3);
   world.initialize();
 
-  // Buttons (testweise)
-  // bedenke: wir wollen nicht nur
-  // vergrössern/-kleinern, sondern von
-  // einem Phänomen zum anderen wechseln.
+  // Buttons (testweise) bedenke: wir wollen nicht nur
+  // vergrössern/-kleinern, sondern zwischen Phänomen wechseln.
   wane_button = createButton('wane');
   wax_button = createButton('wax');
   wane_button.mousePressed(wanePhenomenon);
   wax_button.mousePressed(waxPhenomenon);
 }
 
-function waxPhenomenon() {
-  world.active_phenomenon.wax = true;
-}
+function waxPhenomenon() { world.active_phenomenon.wax = true; }
 
-function wanePhenomenon() {
-  world.active_phenomenon.wane = true;
-}
+function wanePhenomenon() { world.active_phenomenon.wane = true; }
 
 function draw() {
   noFill();
@@ -48,5 +42,6 @@ function draw() {
   }
   // - wie müssen die Knoten verschoben werden,
   // um mit denen des nächsten Phänomens übereinzustimmen?
+  // knoten[0] überlagern, indem alles gedreht wird. dann jeden weiteren schieben.
   // dann: umschalten zwischen vielen Phänomenen
 }
