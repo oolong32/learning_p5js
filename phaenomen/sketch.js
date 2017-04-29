@@ -1,6 +1,8 @@
 var world;
 var wane_button;
 var wax_button;
+var rotCW_button;
+var rotCCW_button;
 
 function setup() {
   // pixelDensity(1.0);
@@ -14,15 +16,33 @@ function setup() {
 
   // Buttons (testweise) bedenke: wir wollen nicht nur
   // vergrössern/-kleinern, sondern zwischen Phänomen wechseln.
-  wane_button = createButton('wane');
-  wax_button = createButton('wax');
+  wane_button = createButton('Wane');
+  wax_button = createButton('Wax');
   wane_button.mousePressed(wanePhenomenon);
   wax_button.mousePressed(waxPhenomenon);
+
+  // Buttons zum Testen Rotation
+  rotCW_button = createButton('Rotate Clockwise');
+  rotCCW_button = createButton('Rotate Counterclockwise');
+  rotCW_button.mousePressed(rotCW);
+  rotCCW_button.mousePressed(rotCCW);
+
+  // erstes mal einblenden der eigenschaften der Phaenomene
+  specs();
 }
 
-function waxPhenomenon() { world.active_phenomenon.wax = true; }
-
-function wanePhenomenon() { world.active_phenomenon.wane = true; }
+function waxPhenomenon() {
+  world.active_phenomenon.wax = true;
+}
+function wanePhenomenon() {
+  world.active_phenomenon.wane = true;
+}
+function rotCW() {
+  world.active_phenomenon.rotateCW();
+}
+function rotCCW() {
+  world.active_phenomenon.rotateCCW();
+}
 
 function draw() {
   noFill();
