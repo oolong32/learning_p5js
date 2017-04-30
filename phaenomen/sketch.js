@@ -6,7 +6,7 @@ var rotCCW_button;
 
 function setup() {
   // pixelDensity(1.0);
-  createCanvas(500, 500);
+  createCanvas(600, 540);
   // frameRate(5);
   
   var particles = 70;
@@ -27,6 +27,12 @@ function setup() {
   rotCW_button.mousePressed(rotCW);
   rotCCW_button.mousePressed(rotCCW);
 
+  var ui = createDiv('');
+  ui.id('ui-buttons');
+  ui.child(wane_button);
+  ui.child(wax_button);
+  ui.child(rotCW_button);
+  ui.child(rotCCW_button);
   // erstes mal einblenden der eigenschaften der Phaenomene
   specs();
 }

@@ -1,3 +1,7 @@
+// es ist nicht so elegant wie gewünscht:
+// specs() wird aus den methoden von Phenomenon() gerufen
+// aber fürs erste ist es ok
+
 var specs = function(foo) {
   /* print some information
   if (foo) {
