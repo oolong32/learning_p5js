@@ -1,0 +1,67 @@
+html, * {
+  margin: 0;
+}
+
+body {
+  padding: 0;
+  margin: 1em;
+  background: #000;
+  color: navajowhite;
+  font-family: InputMonoNarrow, monospace;
+  font-weight: 100;
+  font-feature-settings: "ss01", "ss02", "ss03"; 
+  font-size: 10px;
+  /* GRID */
+  display: grid;
+  grid-template-columns: repeat(5, [col] 200px);
+  grid-gap: 10px;
+}
+
+canvas {
+  grid-column: 1 / 4;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 300;
+}
+
+#ui-buttons {
+ grid-area: 4/1/5/4;
+ display: flex;
+ flex-direction: row;
+ justify-content: space-around;
+}
+
+.phenomena-specs {
+  grid-area: 1/4/10/6;
+}
+
+h1 {
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+article {
+  margin-bottom: 2em;
+  letter-spacing: 0.25px;
+}
+
+article h2 {
+  display: inline-block;
+  letter-spacing: 1px;
+  margin-bottom: 0.2em;
+  font-size: 1em;
+  text-transform: uppercase;
+}
+
+article h3 {
+  display: inline-block;
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
+  font-size: 1em;
+  border-bottom: solid 2px ;
+}
+
+article.active {
+  color: plum;
+}

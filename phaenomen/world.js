@@ -4,6 +4,7 @@ function World(particles, phenomena) {
   this.particles = [];
   this.phenomena = [];
   this.active_phenomenon = null;
+  this.active_phenomenon_index = null;
   this.ctr = Math.random() * 1000; // für noise
 
   this.initialize = function() {
@@ -23,7 +24,9 @@ function World(particles, phenomena) {
       phenomenon.initialize();
       this.phenomena.push(phenomenon);
     }
-    this.active_phenomenon = this.phenomena[this.phenomena.length-1];
+    var active = this.phenomena.length - 1; // hardcoded shit, needs to go eventually, gäll
+    this.active_phenomenon = this.phenomena[active];
+    this.active_phenomenon_index = active;
   };
 
   this.positionParticles = function() {
