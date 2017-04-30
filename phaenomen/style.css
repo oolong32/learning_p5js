@@ -26,10 +26,27 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 #ui-buttons {
- grid-area: 4/1/5/4;
- display: flex;
- flex-direction: row;
- justify-content: space-around;
+  grid-area: 4/1/5/4;
+  /* display: flex; */
+  /* flex-direction: row; */
+  /* justify-content: space-around; */
+  display: grid;
+  grid-template-columns: 300px 300px;
+  grid-gap: 20px;
+}
+
+#ui-buttons button {
+  /* width: 200px; */
+  background: papayaWhip;
+  border: none;
+  font-family: InputMonoNarrow;
+  height: 1.5em;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#ui-buttons button:hover {
+  background: plum;
 }
 
 .phenomena-specs {

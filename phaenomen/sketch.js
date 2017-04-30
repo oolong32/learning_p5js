@@ -3,6 +3,8 @@ var wane_button;
 var wax_button;
 var rotCW_button;
 var rotCCW_button;
+var foo;
+var bar;
 
 function setup() {
   // pixelDensity(1.0);
@@ -27,28 +29,48 @@ function setup() {
   rotCW_button.mousePressed(rotCW);
   rotCCW_button.mousePressed(rotCCW);
 
+  // Button zum umschalten zwischen den Phänomenen
+  foo = createButton('Shift Up');
+  bar = createButton('Shift Down');
+  foo.mousePressed(shiftUp);
+  bar.mousePressed(shiftDown);
+
   var ui = createDiv('');
   ui.id('ui-buttons');
   ui.child(wane_button);
   ui.child(wax_button);
   ui.child(rotCW_button);
   ui.child(rotCCW_button);
-  // erstes mal einblenden der eigenschaften der Phaenomene
+  ui.child(foo);
+  ui.child(bar);
+
+  // erstes mal einblenden der Eigenschaften der Phaenomene
   specs();
 }
 
 function waxPhenomenon() {
   world.active_phenomenon.wax = true;
 }
+
 function wanePhenomenon() {
   world.active_phenomenon.wane = true;
 }
+
 function rotCW() {
   world.active_phenomenon.rotateCW();
 }
+
 function rotCCW() {
   world.active_phenomenon.rotateCCW();
 }
+
+function shiftUp() {
+  world.shiftToPhenomenon(1);
+};
+
+function shiftDown() {
+  world.shiftToPhenomenon(-1);
+};
 
 function draw() {
   noFill();

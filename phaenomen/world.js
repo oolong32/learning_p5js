@@ -8,23 +8,24 @@ function World(particles, phenomena) {
   this.ctr = Math.random() * 1000; // für noise
 
   this.initialize = function() {
-    // initialize particles, no position yet
+    // Partikel initialisieren
     for (var n = 0; n < this.num_particles; n++) {
       var v = createVector();
       var p = new Partikel(n, v, 20);
       this.particles.push(p);
     }
-    this.positionParticles(); // einmal positionieren bitte
+    // Partikel positionieren
+    this.positionParticles();
+
     // initialize phenomena
     for (var i = 0; i < this.num_phenomena; i++) {
-      // bis auf Weiteres:
-      // Phaenomenon besteht aus zufälliger
+      // bis auf Weiteres: Phaenomenon besteht aus zufälliger
       // Auswahl verfügbarer Partikel.
       var phenomenon = new Phenomenon((i+1) * 3);
       phenomenon.initialize();
       this.phenomena.push(phenomenon);
     }
-    var active = this.phenomena.length - 1; // hardcoded shit, needs to go eventually, gäll
+    var active = this.phenomena.length - 1; // hardcoded, muss weg, gäll
     this.active_phenomenon = this.phenomena[active];
     this.active_phenomenon_index = active;
   };
@@ -47,8 +48,20 @@ function World(particles, phenomena) {
     this.ctr += 0.01
   };
 
-  this.switchPhenomenon = function() {
-    // puh …
+  this.shiftToPhenomenon = function(n) {
+    var target_index = this.active_phenomenon_index + n;
+    var target_phenomenon = this.phenomena[target_index];
+    if (target_phenomenon) {
+      console.log("shift from phenomenon " + this.active_phenomenon_index + " to phenomenon " + target_index);
+      // count nodes
+      console.log("Number of nodes in current phenomenon: " + this.active_phenomenon.original_hosts.length);
+      console.log("Number of nodes in target phenomenon: " + target_phenomenon.original_hosts.length);
+      // compare hosts
+      console.log(this.phenomena[this.active_phenomenon_index].current_hosts);
+      console.log(this.phenomena[target_index].original_hosts);
+    } else {
+      console.log("no phenomenon left in this direction");
+    }
   };
 
   this.displayPhenomena = function() {
