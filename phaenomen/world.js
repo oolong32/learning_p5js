@@ -5,6 +5,7 @@ function World(particles, phenomena) {
   this.phenomena = [];
   this.active_phenomenon = null;
   this.active_phenomenon_index = null;
+  this.transformation_data = null;
   this.ctr = Math.random() * 1000; // für noise
 
   this.initialize = function() {
@@ -48,19 +49,59 @@ function World(particles, phenomena) {
     this.ctr += 0.01
   };
 
-  this.shiftToPhenomenon = function(n) {
-    var target_index = this.active_phenomenon_index + n;
-    var target_phenomenon = this.phenomena[target_index];
-    if (target_phenomenon) {
-      console.log("shift from phenomenon " + this.active_phenomenon_index + " to phenomenon " + target_index);
-      // count nodes
-      console.log("Number of nodes in current phenomenon: " + this.active_phenomenon.original_hosts.length);
-      console.log("Number of nodes in target phenomenon: " + target_phenomenon.original_hosts.length);
-      // compare hosts
-      console.log(this.phenomena[this.active_phenomenon_index].current_hosts);
-      console.log(this.phenomena[target_index].original_hosts);
+  // Verwandlung auslösen
+  // ====================
+  this.initializeTransformation = function(i) {
+    if (!this.transformation_data) {
+      this.transformation_data = {
+        direction: i,
+        cur_phe_index: this.active_phenomenon_index,
+        tar_phe_index: this.active_phenomenon_index + i,
+        cur_num_nodes: this.active_phenomenon.current_hosts.length,
+        tar_num_nodes: this.phenomena[this.active_phenomenon_index + i].original_hosts.length,
+        cur_first_host: this.active_phenomenon.current_hosts[0],
+        tar_first_host: this.phenomena[this.active_phenomenon_index + i].original_hosts[0],
+        cur_hosts: null,
+        tar_hosts: null
+        // positioins of all nodes need to be compared as well
+        // könnte auch per index & phänomene überspringen.
+      }; 
+      console.log(this.transformation_data);
+    }
+  };
+
+  // Verwandlung
+  // ===========
+  this.transformPhenomenon = function() {
+    if (this.transformation_data) {
+      //
+      // is the number of nodes the same?
+      // if not, are there less or more nodes in the target? reduce/add a node.
+      // is the position of the first nodes the same?
+      // if there are any, is the position of all other nodes the same? 
+      // if all of the above are achieved, we may switch to the next phenomenon, thank you
+      //
+      var target_index = this.active_phenomenon_index + this.transformation_data.direction;
+      console.log(target_index);
+      var target_phenomenon = this.phenomena[target_index];
+      if (target_phenomenon) {
+        console.log("shift from phenomenon " + this.active_phenomenon_index + " to phenomenon " + target_index);
+        // count nodes
+        console.log("Number of nodes in current phenomenon: " + this.active_phenomenon.original_hosts.length);
+        console.log("Number of nodes in target phenomenon: " + target_phenomenon.original_hosts.length);
+        // compare hosts
+        console.log(this.phenomena[this.active_phenomenon_index].current_hosts);
+        console.log(this.phenomena[target_index].original_hosts);
+      } else {
+        console.log("no phenomenon left in this direction");
+        this.transformation_data = null;
+      }
+      //
+      // 
+      // avoid too many logs
+      this.transformation_data = null;
     } else {
-      console.log("no phenomenon left in this direction");
+      // nothing.
     }
   };
 
