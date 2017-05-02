@@ -65,11 +65,16 @@ function rotCCW() {
 }
 
 function shiftUp() {
-  world.shiftToPhenomenon(1);
+  // hier sollte gefragt werden, ob der shift schon ausgelöst wurde.
+  // eine entsprechende Variable muss in world.js angelegt werden.
+  // in draw muss für jedes frame shiftPhenomenon ausegführt werden, wahrsch. ohne argument
+  // world.shiftToPhenomenon(1);
+  world.initializeTransformation(1);
 };
 
 function shiftDown() {
-  world.shiftToPhenomenon(-1);
+  world.initializeTransformation(-1);
+  // world.shiftToPhenomenon(-1);
 };
 
 function draw() {
@@ -81,6 +86,7 @@ function draw() {
   world.positionParticles();
   world.displayParticles();
   world.displayPhenomena();
+  world.transformPhenomenon();
 
   if (world.active_phenomenon.wane === true) { // wahrsch.
     // wärs gescheiter, diese bedingung im

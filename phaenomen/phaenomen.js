@@ -26,8 +26,12 @@ function Phenomenon(num) {
                              // entlangbewegt und mit der Position (num) des Zielpartikels
                              // sobald dieses Partikel erreicht ist, wird es in die current_hosts
                              // geschrieben und die Variable growing_node wieder auf null gesetzt.
-  this.changing = null; // hier wird, so lange die Verwandlung dauert ein Objekt gespeichert, welches Infos zur Verwandlung enthält …
 
+  this.changing = null; // hier wird, so lange die Verwandlung dauert ein Objekt gespeichert, welches Infos zur Verwandlung enthält …
+  // streichen? <----------------------------------------- oder?
+
+  // Das Phänomen initialisieren
+  // ===========================
   this.initialize = function() {
     // choose active Particle’s indexes
     while (this.nodes.length < num) {
@@ -67,7 +71,32 @@ function Phenomenon(num) {
     }
   };
 
-  this.pullNode = function() { // removes node that’s nearest to another one
+  // sync representation with original shape
+  // to be used after transformation =======
+  // =======================================
+  this.resetNodes = function() {
+    // this.current_hosts = this.original_hosts;
+    // return true;
+    this.current_hosts = [];
+    this.original_hosts = [];
+    for (var i = 0; i < this.anzahl_partikel; i++) {
+      var found = false;
+      for (var n = 0; n < this.nodes.length; n++) {
+        if (i === this.nodes[n]) {
+          this.original_hosts.push(i);
+          this.current_hosts.push(i);
+          found = true;
+          break;
+        }
+      }
+    }
+    console.log("done");
+    return true;
+  };
+
+  // removes node that’s nearest to another one
+  // ==========================================
+  this.pullNode = function() {
     // identify position of smallest small_gap between nodes
     var small_gap = this.findSmallGap();
 
@@ -80,7 +109,6 @@ function Phenomenon(num) {
       } else { // last and second_last overlapping
         this.current_hosts.splice((small_gap[2] + 1) % this.current_hosts.length, 1);
         this.wane = false;
-        specs('update');
         return null;
       }
     } else { // only one particle left
@@ -90,11 +118,13 @@ function Phenomenon(num) {
     }
   };
 
-  this.pushNode = function() { // adds node at random pos in biggest gap
+  // adds node at random pos in biggest gap
+  // ======================================
+  this.pushNode = function() {
     var big_gap = this.findBigGap();
 
     if (!big_gap) { // es sind keine Lücken mehr frei
-      console.log("no mo’ gaps, yo!");
+      // console.log("no mo’ gaps, yo!");
       this.wax = false;
       this.growing_node = null; // this.growing_node zurücksetzen
       return null;
@@ -112,7 +142,7 @@ function Phenomenon(num) {
         // neuen Knoten initialisieren 
         this.growing_node = {};
         this.growing_node["temp_host"] = pos_left_node;
-        this.growing_node["target_particle"] = pos_new_node;
+        this.growing_node["target_host"] = pos_new_node;
     
         // die sichtbare Form erhält einen neuen Knoten, der im Moment noch
         // am gleichen Ort ankert  wie sein vorhergehender Nachbar
@@ -121,21 +151,19 @@ function Phenomenon(num) {
         this.growing_node["pos_in_nodes"] = new_index; // Welchen Index hat der neue Knoten?
       }
 
-      if (this.growing_node["temp_host"] === this.growing_node["target_particle"]) {
+      if (this.growing_node["temp_host"] != this.growing_node["target_host"]) {
+        this.replaceHostRight(this.growing_node["pos_in_nodes"]);
+        this.growing_node["temp_host"] = this.current_hosts[this.growing_node["pos_in_nodes"]];
+        // this.wax bleibt true
+        return null;
 
+      } else { // new_node ist noch unterwegs
         // Wachstum beendet
         // console.log("finished growing");
         this.wax = false;
         
         // Behälter für neuen Knoten leeren
         this.growing_node = null;
-        specs('update');
-        return null;
-
-      } else { // new_node ist noch unterwegs
-        this.replaceHostRight(this.growing_node["pos_in_nodes"]);
-        this.growing_node["temp_host"] = this.current_hosts[this.growing_node["pos_in_nodes"]];
-        // this.wax bleibt true
         return null;
       }
     }
@@ -215,14 +243,12 @@ function Phenomenon(num) {
     for (var i = 0; i < this.current_hosts.length; i++) {
       this.replaceHostRight(i); 
     }
-    specs('update');
   };
 
   this.rotateCCW = function() { // rotates the representation counterclockwise
     for (var i = 0; i < this.current_hosts.length; i++) {
       this.replaceHostLeft(i); 
     }
-    specs('update');
   };
 
   this.display = function(option) {
@@ -230,7 +256,13 @@ function Phenomenon(num) {
     // if option is set, an ellipsis is drawn around particles
     for (var i = 0; i < this.current_hosts.length; i++) {
       var das_partikel = this.listAllParticles()[this.current_hosts[i]];
-      das_partikel.repraesentieren(option);
+      if (das_partikel) {
+        das_partikel.repraesentieren(option);
+      } else {
+        console.log("we lost a particle, what?");
+        // ab hier endless loop :-(
+        break;
+      }
     };
     
     // draw line
@@ -238,7 +270,15 @@ function Phenomenon(num) {
     stroke(255, 50, 0);
     beginShape();
     for (var i = 0; i < this.current_hosts.length; i++) {
-      var pos = this.listAllParticles()[this.current_hosts[i]].pos;
+      // avoid dropping the ball
+      // it seems the values in this array don’t get written in time
+      // sometimes.
+      if (!this.current_hosts[i] && this.current_hosts[i] != 0) { // 0 seems to be falsy !?
+        console.log("dropped a position, for heaven’s sake");
+        var pos = createVector(0, 0);
+      } else {
+        var pos = this.listAllParticles()[this.current_hosts[i]].pos;
+      }
       vertex(pos.x, pos.y);
     };
     endShape(CLOSE);
@@ -272,36 +312,5 @@ function Phenomenon(num) {
       }
     }
     return curHosts;
-  };
-
-  this.shiftShape = function(target) { // change the apparition of a phenomenon aka. it’s representation to match the target phenomenon representation
-    //
-    // MOST? OF THIS SHOULD GO INTO WORLD, OR NOT? WHAT?
-    //
-    // 1. Step
-    // - match the number of nodes of the target phenomenon
-    // - rotate to move node[0] of this to target
-    // - move other nodes into position, if and as long there are any nodes with diverging positions
-    // - switch active state to target phenomenon
-    // revert current_nodes of shifted phenomenon to origial state
-    // while doing all this, set this.changing to true, or add object containing all neccessary information
-    if (!this.changing) {
-      this.changing = {
-        under_way: true,
-        target_index: target,
-        num_target_nodes: world.pheonmena[target].nodes.num
-      };
-    }
-    if (this.changin.under_way) {
-      // are the number of nodes equal yet?
-      // if no, add/remove one
-      
-        // if yes, are the first nodes overlapping yet?
-        // if no, rotate this shit
-
-          // if yes, are the other nodes (if there are any) overlapping yet?
-      
-            // if yes, set this.current_hosts to this.original_hosts and set world.phenomena[target] to active
-    }
   };
 }
