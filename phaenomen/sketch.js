@@ -1,3 +1,4 @@
+"use strict"
 var world;
 var wane_button;
 var wax_button;
@@ -8,11 +9,11 @@ var bar;
 
 function setup() {
   // pixelDensity(1.0);
-  createCanvas(600, 540);
+  createCanvas(500, 400);
   // frameRate(5);
   
-  var particles = 70;
-  var phenomena = 3;
+  var particles = 40;
+  var phenomena = 5;
   world = new World(particles, phenomena);
   world.initialize();
 
@@ -77,28 +78,43 @@ function shiftDown() {
   // world.shiftToPhenomenon(-1);
 };
 
+function checkPhenomenon() {
+  // checks if the curren nodes of the active phenomenon are present
+  // there are cases, where part of the array is not written in time
+  // to draw the particles.
+  var nodes = world.active_phenomenon.current_hosts;
+  var ok = true;
+  for (var i = 0; i >= 0; i--) {
+    var node = nodes[i];
+    if (!node) {
+      ok = false;
+      break;
+    }
+  }
+  return true;
+}
+
 function draw() {
   noFill();
   stroke(255);
   background(0);
   translate(width/2, height/2);
 
-  world.positionParticles();
-  world.displayParticles();
-  world.displayPhenomena();
-  world.transformPhenomenon();
+  if (checkPhenomenon()) {
 
-  if (world.active_phenomenon.wane === true) { // wahrsch.
-    // wärs gescheiter, diese bedingung im
-    // objekt world oder phenomenon unterzubringen?
-    world.active_phenomenon.pullNode();
-  }
+    world.positionParticles();
+    world.displayParticles();
+    world.displayPhenomena();
+    world.transformPhenomenon();
 
-  if (world.active_phenomenon.wax === true) { // dito.
-    world.active_phenomenon.pushNode();
+    if (world.active_phenomenon.wane === true) { // wahrsch.
+      // wärs gescheiter, diese bedingung im
+      // objekt world oder phenomenon unterzubringen?
+      world.active_phenomenon.pullNode();
+    }
+
+    if (world.active_phenomenon.wax === true) { // dito.
+      world.active_phenomenon.pushNode();
+    }
   }
-  // - wie müssen die Knoten verschoben werden,
-  // um mit denen des nächsten Phänomens übereinzustimmen?
-  // knoten[0] überlagern, indem alles gedreht wird. dann jeden weiteren schieben.
-  // dann: umschalten zwischen vielen Phänomenen
 }

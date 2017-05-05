@@ -146,24 +146,23 @@ function Phenomenon(num) {
     
         // die sichtbare Form erhält einen neuen Knoten, der im Moment noch
         // am gleichen Ort ankert  wie sein vorhergehender Nachbar
-        var new_index = big_gap[2] + 1 % this.current_hosts.length;
+        var new_index = (big_gap[2] + 1) % this.current_hosts.length;
         this.current_hosts.splice(new_index, 0, this.listAllParticles()[this.growing_node["temp_host"]].num);
-        this.growing_node["pos_in_nodes"] = new_index; // Welchen Index hat der neue Knoten?
+        this.growing_node["pos_in_nodes"] = new_index % this.current_hosts.length; // Welchen Index hat der neue Knoten?
       }
 
-      if (this.growing_node["temp_host"] != this.growing_node["target_host"]) {
-        this.replaceHostRight(this.growing_node["pos_in_nodes"]);
-        this.growing_node["temp_host"] = this.current_hosts[this.growing_node["pos_in_nodes"]];
+      if (this.growing_node["temp_host"] != this.growing_node["target_host"]) { // new_node ist noch unterwegs
+        this.replaceHostRight(this.growing_node["pos_in_nodes"] % this.current_hosts.length);
+
+        this.growing_node["temp_host"] = this.current_hosts[this.growing_node["pos_in_nodes"] % this.current_hosts.length];
         // this.wax bleibt true
         return null;
 
-      } else { // new_node ist noch unterwegs
-        // Wachstum beendet
+      } else {
         // console.log("finished growing");
-        this.wax = false;
+        this.wax = false; // Wachstum beenden
         
-        // Behälter für neuen Knoten leeren
-        this.growing_node = null;
+        this.growing_node = null; // Behälter für neuen Knoten leeren
         return null;
       }
     }
@@ -236,6 +235,14 @@ function Phenomenon(num) {
 
   this.replaceHostRight = function(i) { // ‘moves’ node at index i one space cw
     var succeeding = (this.current_hosts[i] + 1) % this.anzahl_partikel;
+    // ist es möglich, dass statt eines index in current_host, die position eines partikels als paramter geliefert wird?
+    // console.log("this.current_hosts: ", this.current_hosts);
+    // console.log("node to move: " + i);
+    // console.log("this.current_hosts[" + i + "] = ", this.current_hosts[i]);
+    // console.log("this.current_hosts[" + i + "] + 1 = ",  this.current_hosts[i] + 1);
+    // console.log("this.anzahl_partikel = ", this.anzahl_partikel);
+
+    // console.log(this.current_hosts[i] + 1 % this.anzahl_partikel); // <---------------------------------- gets to be NaN !!!!!!!!
     this.current_hosts[i] = succeeding;
   };
 
@@ -259,9 +266,7 @@ function Phenomenon(num) {
       if (das_partikel) {
         das_partikel.repraesentieren(option);
       } else {
-        console.log("we lost a particle, what?");
-        // ab hier endless loop :-(
-        break;
+        return null;
       }
     };
     
@@ -274,7 +279,7 @@ function Phenomenon(num) {
       // it seems the values in this array don’t get written in time
       // sometimes.
       if (!this.current_hosts[i] && this.current_hosts[i] != 0) { // 0 seems to be falsy !?
-        console.log("dropped a position, for heaven’s sake");
+        // console.log("dropped a position, for heaven’s sake");
         var pos = createVector(0, 0);
       } else {
         var pos = this.listAllParticles()[this.current_hosts[i]].pos;
