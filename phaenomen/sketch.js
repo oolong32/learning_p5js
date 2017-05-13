@@ -7,8 +7,11 @@ var world;
 var shift_up_button;
 var shift_down_button;
 var noise_slider;
+var noise_slider_label;
 var segment_slider;
+var segment_slider_label;
 var ring_slider;
+var ring_slider_label;
 
 function setup() {
   // pixelDensity(1.0);
@@ -41,6 +44,9 @@ function setup() {
 
   // Slider Varianz Noise
   noise_slider = createSlider(0, 120, 0);
+  noise_slider.id('noise-slider');
+  noise_slider_label = createElement('label', 'Amount of noise');
+  noise_slider_label.attribute('for', 'noise-slider');
   noise_slider.changed(function() {
     var val = noise_slider.value();
     console.log(val);
@@ -49,19 +55,25 @@ function setup() {
 
   // Slider Anzahl Segmente der Fühler
   segment_slider = createSlider(0, 40, 20);
+  segment_slider.id('segment-slider');
+  segment_slider_label = createElement('label', 'Number of feeler segments');
+  segment_slider_label.attribute('for', 'segment-slider');
   segment_slider.changed(function() {
     var val = segment_slider.value();
     console.log(val);
-    for (var i = 0; i < world.particles.length; i++) {
-      var p = world.particles[i];
-      if (p.feeler) {
-        p.feeler.number_of_segments = val; 
+    var f = world.active_phenomenon.feelers;
+    if (f.length > 0); {
+      for (var i = 0; i < f.length; i++) {
+        f[i].number_of_segments = val; 
       }
     }
   });
 
   // Slider Anzahl Partikel-Ringe
   ring_slider = createSlider(0, 12, 4);
+  ring_slider.id('ring-slider');
+  ring_slider_label = createElement('label', 'Number of particle rings');
+  ring_slider_label.attribute('for', 'ring-slider');
   ring_slider.changed(function() {
     for (var i = 0; i < world.particles.length; i++) {
       var val = ring_slider.value();
@@ -78,8 +90,11 @@ function setup() {
   // ui.child(rotCCW_button);
   ui.child(shift_up_button);
   ui.child(shift_down_button);
+  ui.child(noise_slider_label);
   ui.child(noise_slider);
+  ui.child(segment_slider_label);
   ui.child(segment_slider);
+  ui.child(ring_slider_label);
   ui.child(ring_slider);
 
   // erstes mal einblenden der Eigenschaften der Phaenomene

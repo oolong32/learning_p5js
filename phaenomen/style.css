@@ -74,6 +74,11 @@ input[type=range]::-ms-track {
 input[type=range] {
 }
 
+label {
+  text-align: right;
+  /* font-weight: 300; */
+}
+
 /* Slider Styles bis hier */
 
 .phenomena-specs {
@@ -87,7 +92,7 @@ h1 {
   color: whitesmoke;
 }
 
-article {
+article, label {
   margin-bottom: 2em;
   letter-spacing: 0.25px;
 }
