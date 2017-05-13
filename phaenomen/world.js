@@ -7,6 +7,7 @@ function World(particles, phenomena) {
   this.active_phenomenon_index = null;
   this.transformation_data = null;
   this.ctr = Math.random() * 1000; // für noise
+  this.noise_range = 0;
 
 
   this.initialize = function() {
@@ -30,9 +31,11 @@ function World(particles, phenomena) {
       phenomenon.initialize();
       this.phenomena.push(phenomenon);
     }
-    var active = this.phenomena.length - 1; // hardcoded, muss weg, gäll
+    var active = Math.trunc(this.phenomena.length / 2); // <----------------------- hardcoded, muss weg, gäll?
     this.active_phenomenon = this.phenomena[active];
     this.active_phenomenon_index = active;
+    var now = new Date();
+    this.active_phenomenon.timestamp = now.getTime();
   };
 
   // ======================
@@ -45,8 +48,8 @@ function World(particles, phenomena) {
       var cos_a = cos(a);
       var sin_a = sin(a);
       var laerm = noise(cos_a + 1, sin_a + 1, this.ctr);
-      var range = 40; // auch dies besser this.turbulence oder so … könnte auch mit noise manipuliert werden?
-      var m = 150 + map(laerm, 0, 1, -range, range); // 220 = magnitude, should be a var of World (this.incentive) or something
+      var range = this.noise_range; // auch dies besser this.turbulence oder so … könnte auch mit noise manipuliert werden?
+      var m = 220 + map(laerm, 0, 1, -range, range); // 220 = magnitude, should be a var of World (this.incentive) or something
       var x = cos_a * m;
       var y = sin_a * m;
       this.particles[i].pos.x = x;
@@ -55,6 +58,15 @@ function World(particles, phenomena) {
     }
     this.ctr += 0.01
   };
+
+  // === ===== =====
+  // Set Noise Range
+  // === ===== =====
+  this.setNoiseRange = function(new_noise_range) {
+    this.noise_range = new_noise_range;
+    return true;
+  };
+  
 
   // ====================
   // Verwandlung auslösen

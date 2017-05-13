@@ -268,7 +268,7 @@ function Phenomenon(num) {
       } else {
         return null;
       }
-    };
+    }
     
     // draw line
     push();
@@ -287,6 +287,30 @@ function Phenomenon(num) {
       vertex(pos.x, pos.y);
     };
     endShape(CLOSE);
+    // pop();
+
+    // test --- zusätzliche Ebenen zufügen.
+    // problem --- was passiert bei verwandlungen?
+    if (world.particles[this.current_hosts[0]].feeler.segments.length > 0) {
+      var transp = 255;
+      for (var i = 0; i < world.particles[this.current_hosts[0]].feeler.segments.length; i++) {
+        stroke(255, 50, 0, transp);
+        beginShape();
+        for (var j = 0; j < this.current_hosts.length; j++) {
+          if (world.particles[this.current_hosts[j]].feeler.segments[i]) {
+            var segment_vector = createVector(world.particles[this.current_hosts[j]].feeler.segments[i].x, world.particles[this.current_hosts[j]].feeler.segments[i].y);
+          } else {
+            var segment_vector = createVector(world.particles[this.current_hosts[j]].pos.x, world.particles[this.current_hosts[j]].pos.y);
+            // jaja, alles noch nicht so sauber, was?
+            // schön wäre, wenn das nicht hier drin geschähe :-/
+          }
+          var segment_position = world.particles[this.current_hosts[j]].pos.add(segment_vector);
+          vertex(segment_position.x, segment_position.y);
+        }
+        endShape(CLOSE);
+        transp -= 255/world.particles[this.current_hosts[0]].feeler.number_of_segments;
+      }
+    }
     pop();
   };
 
