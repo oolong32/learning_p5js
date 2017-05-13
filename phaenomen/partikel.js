@@ -7,52 +7,70 @@ function Partikel(n, v, r) {
   this.pos = v;
   this.r = r
   this.dir = v.normalize();
-  this.feeler = new Feeler();
+  this.rings = 5; // benutzt um zusätziche ringe um die Partikel zu zeichnen.
 
+
+  // can we have some effect on the host besides a circle?
+  // test something else
+  var circle = {
+    radius: 2,
+    max_radius: this.r,
+    opacity: 255
+  };
+      
 
   this.repraesentieren = function(option) {
     if (option) {
       push();
-      stroke(0, 180, 255);
-      ellipse(this.pos.x, this.pos.y, r, r);
+      stroke(200, 180, 0, 150);
+        ellipse(this.pos.x, this.pos.y, this.r, this.r);
+      // var radius = r;
+      // for (var i = 0; i < 6; i++) {
+      //   radius += 6;
+      // }
       pop();
 
-      // add some arbitrary stuff, gäll
-      // e.g. feelers
-      push();
-      stroke(180, 200, 0);
-      if (!this.feeler.ready && this.feeler.whatTimeIsIt() > 2) {
-        this.feeler.ready = true;
-        // console.log("feeler ready");
-      }
-      if (this.feeler.ready) {
-        this.feeler.addSegment(this.pos.x, this.pos.y);
-        this.feeler.update();
+//       push();
+//       stroke(200, 180, 0, circle.opacity);
+//       ellipse(this.pos.x, this.pos.y, circle.radius, circle.radius);
+//       ellipse(this.pos.x, this.pos.y, 0.6*circle.radius, 0.6*circle.radius);
+//       ellipse(this.pos.x, this.pos.y, 1.4*circle.radius, 1.4*circle.radius);
+//       if (circle.radius < circle.max_radius) {
+//         circle.radius += 0.1;
+//         circle.opacity -= 255/(10*(circle.max_radius - 2));
+//       } else {
+//         circle.radius = 2;
+//         circle.opacity = 255;
+//       }
+//       pop();
 
-        // display Feeler. We’ll do it right here, what
-        // because we need the particle’s origin as a starting point
-        // this is messy, the feeler segments are connected to polygons elsewhere:
-        var transp = 255;
-        beginShape();
-        strokeWeight(1);
-        var origin = createVector(this.pos.x, this.pos.y);
-        vertex(origin.x, origin.y);
-        if (this.feeler.segments.length > 0) {
-          for (var i = 0; i < this.feeler.segments.length; i++) {
-            stroke(180, 200, 0, transp);
-            var next_vector = origin.add(this.feeler.segments[i]);
-            vertex(next_vector.x, next_vector.y);
-            transp -= 255/this.feeler.number_of_segments;
-          }
-        }
-        endShape(); 
-      }
-      
-      // line(this.pos.x, this.pos.y, this.feeler.pos.x, this.feeler.pos.y);
-      // ellipse(this.feeler.pos.x, this.feeler.pos.y, 4, 4);
-      pop();
+
+
     } else {
       point(this.pos.x, this.pos.y)
+      push();
+      strokeWeight(1);
+      stroke(255, 255, 255, 75);
+      var next = world.particles[(this.num + 1) % world.particles.length]
+      line(this.pos.x, this.pos.y, next.pos.x, next.pos.y);
+ 
+      // Partikel-Ring "multiplizieren"
+      var new_vector = createVector(this.pos.x, this.pos.y);
+      var new_next_vector = createVector(next.pos.x, next.pos.y);
+      var cur_length = new_vector.mag();
+      var next_length = new_next_vector.mag();
+      new_vector.setMag(cur_length * 1.025);
+      new_next_vector.setMag(next_length * 1.025);
+      for (var i = 0; i < this.rings; i++) {
+        line(new_vector.x, new_vector.y, new_next_vector.x, new_next_vector.y)
+        cur_length = new_vector.mag();
+        next_length = new_next_vector.mag();
+        new_vector.setMag(cur_length * 1.025);
+        new_next_vector.setMag(next_length * 1.025);
+
+      }
+      pop();
+
     }
   };
 }

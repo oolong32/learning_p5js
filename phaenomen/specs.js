@@ -34,17 +34,17 @@ var specs = function(foo) {
     h2.innerHTML = 'Phenomenon ' + i;
     article.appendChild(h2);
     on = document.createElement('p');
-    on.innerHTML = 'Number of original nodes: ' + world.phenomena[i].nodes.length;
+    on.innerHTML = 'Orig. nodes: ' + world.phenomena[i].nodes.length;
     article.appendChild(on);
     cn = document.createElement('p');
-    cn.innerHTML =  'Number of current nodes: ' + world.phenomena[i].current_hosts.length;
+    cn.innerHTML =  'Curr. nodes: ' + world.phenomena[i].current_hosts.length;
     article.appendChild(cn);
     h = document.createElement('h3');
     h.innerHTML = 'Hosts';
     article.appendChild(h);
     for (var j = 0; j < world.phenomena[i].current_hosts.length; j++) {
       var pp = document.createElement('p');
-      pp.innerHTML = 'N°&thinsp;' + j + ': ' + world.phenomena[i].current_hosts[j];
+      pp.innerHTML = 'N°&#x2006;' + j + ': ' + world.phenomena[i].current_hosts[j];
       article.appendChild(pp);
       
     }

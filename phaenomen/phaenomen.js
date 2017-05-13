@@ -11,11 +11,6 @@ function Phenomenon(num) {
 
   this.original_hosts = []; // Indexe der Partikel, wo bei Initialisierung Knoten ankern 
 
-  this.freie_partikel = []; // enthält Indexe der Partikel, die nicht als Hosts fungieren.
-                            // Nebst der Frage, ob von 'Hosts' und 'Freien' gesprochen wird,
-                            // ist hier von Interesse: Diese Listen werden nicht beeinflusst
-                            // von wax/wane. All dies betrifft nur 'current_hosts'.
-
   this.current_hosts = [];  // Indexe der Hosts der sichtbaren Repräsentation des Phänomens.
                             // wird gebraucht, damit die ursprüngliche Form des Phänomens
                             // unverändert bleibt, auch wenn sich das Phänomen der Form eines
@@ -27,12 +22,16 @@ function Phenomenon(num) {
                              // sobald dieses Partikel erreicht ist, wird es in die current_hosts
                              // geschrieben und die Variable growing_node wieder auf null gesetzt.
 
-  this.changing = null; // hier wird, so lange die Verwandlung dauert ein Objekt gespeichert, welches Infos zur Verwandlung enthält …
-  // streichen? <----------------------------------------- oder?
+  this.feelers = [] // Fühler der einzelnen Knoten
+
+  this.age = null;
 
   // Das Phänomen initialisieren
   // ===========================
   this.initialize = function() {
+    // timestamp
+    var t = new Date();
+    this.age = t.getTime(); 
     // choose active Particle’s indexes
     while (this.nodes.length < num) {
       random_index = floor(random(this.anzahl_partikel));
@@ -51,10 +50,9 @@ function Phenomenon(num) {
           this.nodes.push(random_index);
         }
       }
-    } // bis hier: this.node befüllen, um eine zufällige Auswahl von Knoten zu erhalten
+    } // bis hier: this.nodes befüllen, um eine zufällige Auswahl von Knoten zu erhalten
 
-    // Particles in 'Hosts' and 'Freie' teilen
-    // bleibt zu beweisen, ob 'Freie' notwendig sind.
+    // 'Hosts' unter den Partikeln finden
     for (var i = 0; i < this.anzahl_partikel; i++) {
       var found = false;
       for (var n = 0; n < this.nodes.length; n++) {
@@ -66,8 +64,13 @@ function Phenomenon(num) {
         }
       }
       if (!found) {
-        this.freie_partikel.push(i);
+        // nix. hier könnte man freie Partikel sammeln
       }
+    }
+
+    // jedem Knoten einen Fühler
+    for (var i = 0; i < this.current_hosts.length; i++) {
+      this.feelers.push(new Feeler());
     }
   };
 
@@ -79,18 +82,21 @@ function Phenomenon(num) {
     // return true;
     this.current_hosts = [];
     this.original_hosts = [];
+    this.feelers = [];
     for (var i = 0; i < this.anzahl_partikel; i++) {
       var found = false;
       for (var n = 0; n < this.nodes.length; n++) {
         if (i === this.nodes[n]) {
           this.original_hosts.push(i);
           this.current_hosts.push(i);
+          this.feelers.push(new Feeler());
           found = true;
           break;
         }
       }
     }
-    console.log("done");
+    var t = new Date();
+    this.age = t.getTime(); 
     return true;
   };
 
@@ -108,6 +114,7 @@ function Phenomenon(num) {
         this.replaceHostLeft((small_gap[2] + 1) % this.current_hosts.length);
       } else { // last and second_last overlapping
         this.current_hosts.splice((small_gap[2] + 1) % this.current_hosts.length, 1);
+        this.feelers.splice((small_gap[2] + 1) % this.current_hosts.length, 1); // wir entfernen auch einen fühler
         this.wane = false;
         return null;
       }
@@ -143,25 +150,22 @@ function Phenomenon(num) {
         this.growing_node = {};
         this.growing_node["temp_host"] = pos_left_node;
         this.growing_node["target_host"] = pos_new_node;
-    
         // die sichtbare Form erhält einen neuen Knoten, der im Moment noch
         // am gleichen Ort ankert  wie sein vorhergehender Nachbar
         var new_index = (big_gap[2] + 1) % this.current_hosts.length;
         this.current_hosts.splice(new_index, 0, this.listAllParticles()[this.growing_node["temp_host"]].num);
+        this.feelers.splice(new_index, 0, new Feeler());
+        //jezt natürlich auch einen neues Segment, gäll
         this.growing_node["pos_in_nodes"] = new_index % this.current_hosts.length; // Welchen Index hat der neue Knoten?
       }
-
       if (this.growing_node["temp_host"] != this.growing_node["target_host"]) { // new_node ist noch unterwegs
         this.replaceHostRight(this.growing_node["pos_in_nodes"] % this.current_hosts.length);
-
         this.growing_node["temp_host"] = this.current_hosts[this.growing_node["pos_in_nodes"] % this.current_hosts.length];
         // this.wax bleibt true
         return null;
-
       } else {
         // console.log("finished growing");
         this.wax = false; // Wachstum beenden
-        
         this.growing_node = null; // Behälter für neuen Knoten leeren
         return null;
       }
@@ -235,14 +239,6 @@ function Phenomenon(num) {
 
   this.replaceHostRight = function(i) { // ‘moves’ node at index i one space cw
     var succeeding = (this.current_hosts[i] + 1) % this.anzahl_partikel;
-    // ist es möglich, dass statt eines index in current_host, die position eines partikels als paramter geliefert wird?
-    // console.log("this.current_hosts: ", this.current_hosts);
-    // console.log("node to move: " + i);
-    // console.log("this.current_hosts[" + i + "] = ", this.current_hosts[i]);
-    // console.log("this.current_hosts[" + i + "] + 1 = ",  this.current_hosts[i] + 1);
-    // console.log("this.anzahl_partikel = ", this.anzahl_partikel);
-
-    // console.log(this.current_hosts[i] + 1 % this.anzahl_partikel); // <---------------------------------- gets to be NaN !!!!!!!!
     this.current_hosts[i] = succeeding;
   };
 
@@ -270,7 +266,7 @@ function Phenomenon(num) {
       }
     }
     
-    // draw line
+    // draw polygon
     push();
     stroke(255, 50, 0);
     beginShape();
@@ -287,28 +283,76 @@ function Phenomenon(num) {
       vertex(pos.x, pos.y);
     };
     endShape(CLOSE);
-    // pop();
+    pop();
 
-    // test --- zusätzliche Ebenen zufügen.
+    // draw feelers
+    // ============
+    push();
+    stroke(180, 200, 0);
+    if (this.feelers.length != this.current_hosts.length) {
+      // test ------ maybe work waits here :-/
+      // seems to be ok
+      console.log("watch out, feelers and nodes not en sync!");
+      console.log("feelers:", this.feelers.length);
+      console.log("current hosts:", this.current_hosts.length);
+    }
+
+    var test_feeler = this.feelers[0];
+    if (!test_feeler.ready && test_feeler.whatTimeIsIt() > 1) {
+      for (var i = 0; i < this.feelers.length; i++) {
+        this.feelers[i].ready = true;
+        // console.log("feelers ready");
+      }
+    }
+    if (test_feeler.ready) {
+      for (var i = 0; i < this.feelers.length; i++) {
+        this.feelers[i].addSegment(world.particles[this.current_hosts[i]].pos.x, world.particles[this.current_hosts[i]].pos.y);
+        this.feelers[i].update();
+      }
+
+      // display Feeler
+      // ==============
+      for (var i = 0; i < this.feelers.length; i++) {
+        var transp = 255;
+        strokeWeight(4);
+        var origin = createVector(world.particles[this.current_hosts[i]].pos.x, world.particles[this.current_hosts[i]].pos.y);
+        if (this.feelers[i].segments.length > 0) {
+          for (var j = 0; j < this.feelers[i].segments.length; j++) {
+            stroke(180, 200, 0, transp);
+            var line_origin = createVector(origin.x, origin.y);
+            var next_vector = origin.add(this.feelers[i].segments[j].pos);
+            line(line_origin.x, line_origin.y, next_vector.x, next_vector.y);
+            transp -= 255/this.feelers[0].number_of_segments;
+          }
+        }
+      }
+    }
+
+    // line(this.pos.x, this.pos.y, this.feeler.pos.x, this.feeler.pos.y);
+    // ellipse(this.feeler.pos.x, this.feeler.pos.y, 4, 4);
+    pop();
+    // Fühler bis hier …
+
     // problem --- was passiert bei verwandlungen?
-    if (world.particles[this.current_hosts[0]].feeler.segments.length > 0) {
+    // es sollte möglich sein, alle Fühler einzufahren und erst dann die Verwandlung zu starten
+    if (this.feelers[0].segments.length > 0) {
       var transp = 255;
-      for (var i = 0; i < world.particles[this.current_hosts[0]].feeler.segments.length; i++) {
-        stroke(255, 50, 0, transp);
+      for (var i = 0; i < this.feelers[0].segments.length; i++) {
+        stroke(255, 80, 0, transp);
         beginShape();
         for (var j = 0; j < this.current_hosts.length; j++) {
-          if (world.particles[this.current_hosts[j]].feeler.segments[i]) {
-            var segment_vector = createVector(world.particles[this.current_hosts[j]].feeler.segments[i].x, world.particles[this.current_hosts[j]].feeler.segments[i].y);
+          var cur_particle = world.particles[this.current_hosts[j]];
+          if (this.feelers[j].segments[i]) {
+            var segment_vector = createVector(this.feelers[j].segments[i].pos.x, this.feelers[j].segments[i].pos.y);
           } else {
-            var segment_vector = createVector(world.particles[this.current_hosts[j]].pos.x, world.particles[this.current_hosts[j]].pos.y);
-            // jaja, alles noch nicht so sauber, was?
-            // schön wäre, wenn das nicht hier drin geschähe :-/
+            var segment_vector = createVector(0, 0);
+            console.log("couldn’t find a segment");
           }
           var segment_position = world.particles[this.current_hosts[j]].pos.add(segment_vector);
           vertex(segment_position.x, segment_position.y);
         }
         endShape(CLOSE);
-        transp -= 255/world.particles[this.current_hosts[0]].feeler.number_of_segments;
+        transp -= 255/this.feelers[0].number_of_segments;
       }
     }
     pop();

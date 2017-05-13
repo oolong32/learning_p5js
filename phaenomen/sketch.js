@@ -8,14 +8,15 @@ var shift_up_button;
 var shift_down_button;
 var noise_slider;
 var segment_slider;
+var ring_slider;
 
 function setup() {
   // pixelDensity(1.0);
   createCanvas(600, 600);
   // frameRate(5);
   
-  var particles = 80;
-  var phenomena = 5;
+  var particles = 40;
+  var phenomena = 3;
   world = new World(particles, phenomena);
   world.initialize();
 
@@ -47,7 +48,7 @@ function setup() {
   });
 
   // Slider Anzahl Segmente der Fühler
-  segment_slider = createSlider(0, 50, 0);
+  segment_slider = createSlider(0, 40, 20);
   segment_slider.changed(function() {
     var val = segment_slider.value();
     console.log(val);
@@ -57,6 +58,16 @@ function setup() {
         p.feeler.number_of_segments = val; 
       }
     }
+  });
+
+  // Slider Anzahl Partikel-Ringe
+  ring_slider = createSlider(0, 12, 4);
+  ring_slider.changed(function() {
+    for (var i = 0; i < world.particles.length; i++) {
+      var val = ring_slider.value();
+      var p = world.particles[i];
+      p.rings = val;
+    } 
   });
 
   var ui = createDiv('');
@@ -69,6 +80,7 @@ function setup() {
   ui.child(shift_down_button);
   ui.child(noise_slider);
   ui.child(segment_slider);
+  ui.child(ring_slider);
 
   // erstes mal einblenden der Eigenschaften der Phaenomene
   specs();
