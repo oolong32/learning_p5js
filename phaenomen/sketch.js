@@ -12,6 +12,8 @@ var segment_slider;
 var segment_slider_label;
 var ring_slider;
 var ring_slider_label;
+var ring_distance_slider;
+var ring_distance_slider_label;
 
 function setup() {
   // pixelDensity(1.0);
@@ -75,10 +77,24 @@ function setup() {
   ring_slider_label = createElement('label', 'Number of particle rings');
   ring_slider_label.attribute('for', 'ring-slider');
   ring_slider.changed(function() {
+    var val = ring_slider.value();
     for (var i = 0; i < world.particles.length; i++) {
-      var val = ring_slider.value();
       var p = world.particles[i];
       p.rings = val;
+    } 
+  });
+
+  // Slider Distanz Partikel-Ringe
+  ring_distance_slider = createSlider(0.75, 1.25, 1.025, 0.025);
+  ring_distance_slider.id('ring-slider');
+  ring_distance_slider_label = createElement('label', 'Distance between particle rings');
+  ring_distance_slider_label.attribute('for', 'ring-slider');
+  ring_distance_slider.changed(function() {
+    var val = ring_distance_slider.value();
+    console.log(val);
+    for (var i = 0; i < world.particles.length; i++) {
+      var p = world.particles[i];
+      p.ring_distance = val;
     } 
   });
 
@@ -96,6 +112,8 @@ function setup() {
   ui.child(segment_slider);
   ui.child(ring_slider_label);
   ui.child(ring_slider);
+  ui.child(ring_distance_slider_label);
+  ui.child(ring_distance_slider);
 
   // erstes mal einblenden der Eigenschaften der Phaenomene
   specs();

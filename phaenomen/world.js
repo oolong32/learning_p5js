@@ -42,6 +42,26 @@ function World(particles, phenomena) {
   // Partikel positionieren
   // ======================
   this.positionParticles = function() {
+  /*
+    var i = 0; // index of particle
+    var xoff = 0;
+    for (var a = 0; a < TWO_PI; a += TWO_PI / this.num_particles) {
+      var cos_a = cos(a);
+      var sin_a = sin(a);
+      var laerm = noise(cos_a + 1, sin_a + 1, this.ctr);
+      var range = this.noise_range; // auch dies besser this.turbulence oder so … könnte auch mit noise manipuliert werden?
+      var m = 220 + map(laerm, 0, 1, -range, range); // 220 = magnitude, should be a var of World (this.incentive) or something
+      var x = cos_a * m;
+      var y = sin_a * m;
+      this.particles[i].pos.x = x;
+      this.particles[i].pos.y = y;
+      i += 1;
+    }
+    this.ctr += 0.01
+    // verdammt rechenintensiv, was?
+    // abschnitt unten gegen "blobby" auswechseln.
+  // am besten zwei funktionen schreiben, einmal blobby einmal 3d-noise um schnell wechseln zu können.
+    */
     var i = 0; // index of particle
     var xoff = 0;
     for (var a = 0; a < TWO_PI; a += TWO_PI / this.num_particles) {

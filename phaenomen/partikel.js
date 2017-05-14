@@ -8,6 +8,7 @@ function Partikel(n, v, r) {
   this.r = r
   this.dir = v.normalize();
   this.rings = 5; // benutzt um zusätziche ringe um die Partikel zu zeichnen.
+  this.ring_distance = 1.025;
 
 
   // can we have some effect on the host besides a circle?
@@ -59,14 +60,14 @@ function Partikel(n, v, r) {
       var new_next_vector = createVector(next.pos.x, next.pos.y);
       var cur_length = new_vector.mag();
       var next_length = new_next_vector.mag();
-      new_vector.setMag(cur_length * 1.025);
-      new_next_vector.setMag(next_length * 1.025);
+      new_vector.setMag(cur_length * this.ring_distance);
+      new_next_vector.setMag(next_length * this.ring_distance);
       for (var i = 0; i < this.rings; i++) {
         line(new_vector.x, new_vector.y, new_next_vector.x, new_next_vector.y)
         cur_length = new_vector.mag();
         next_length = new_next_vector.mag();
-        new_vector.setMag(cur_length * 1.025);
-        new_next_vector.setMag(next_length * 1.025);
+        new_vector.setMag(cur_length * this.ring_distance);
+        new_next_vector.setMag(next_length * this.ring_distance);
 
       }
       pop();
