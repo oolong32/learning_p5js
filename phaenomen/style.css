@@ -1,9 +1,10 @@
 html, * {
   margin: 0;
+  padding: 0;
 }
 
 body {
-  padding: 0;
+  padding: 20px 10px 0;
   margin: 1em;
   background: #000;
   color: gray;
@@ -13,12 +14,24 @@ body {
   font-size: 10px;
   /* GRID */
   display: grid;
-  grid-template-columns: repeat(5, [col] 290px);
-  grid-gap: 20px;
+  grid-template-columns: repeat(9, [col] 120px);
+  grid-template-rows: auto;
+  grid-gap: 10px;
+}
+
+.phenomena-specs {
+  grid-column-start: 1;
+  grid-row-start: 1;
 }
 
 canvas {
-  grid-column: 1 / 3;
+  grid-column-start: 2;
+  grid-row-start: 1;
+  grid-column-end: 6;
+}
+
+#ui-buttons {
+  grid-column: 7/9;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -26,10 +39,15 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 #ui-buttons {
-  grid-area: 2/1/4/3;
   display: grid;
-  grid-template-columns: 290px 290px;
-  grid-gap: 20px;
+  grid-template-columns: 185px 185px;
+  grid-template-rows: repeat(100, [row] 30px);
+  grid-gap: 10px;
+}
+
+#ui-buttons h1 {
+  grid-column-start: 1;
+  grid-column-end: 3;
 }
 
 #ui-buttons button {
@@ -49,6 +67,7 @@ h1, h2, h3, h4, h5, h6 {
 /* Slider Styles */
 
 input[type=range] {
+  cursor: pointer;
   -webkit-appearance: none; /* Hides the slider so that custom slider can be made */
   width: 100%; /* Specific width is required for Firefox. */
   background: transparent; /* Otherwise white in Chrome */
@@ -81,11 +100,8 @@ label {
 
 /* Slider Styles bis hier */
 
-.phenomena-specs {
-  grid-area: 1/3/10/5;
-}
-
 h1 {
+  font-size: 1.5em;
   text-transform: uppercase;
   letter-spacing: 2px;
   margin-bottom: 2.5em;
@@ -93,8 +109,11 @@ h1 {
 }
 
 article, label {
-  margin-bottom: 2em;
   letter-spacing: 0.25px;
+}
+
+article {
+  margin-bottom: 2em;
 }
 
 article h2 {
