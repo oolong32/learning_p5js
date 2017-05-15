@@ -17,11 +17,11 @@ var ring_distance_slider_label;
 
 function setup() {
   // pixelDensity(1.0);
-  createCanvas(600, 600);
+  createCanvas(640, 600);
   // frameRate(5);
   
   var particles = 40;
-  var phenomena = 3;
+  var phenomena = 5;
   world = new World(particles, phenomena);
   world.initialize();
 
@@ -87,7 +87,7 @@ function setup() {
   // Slider Distanz Partikel-Ringe
   ring_distance_slider = createSlider(0.75, 1.25, 1.025, 0.025);
   ring_distance_slider.id('ring-slider');
-  ring_distance_slider_label = createElement('label', 'Distance between particle rings');
+  ring_distance_slider_label = createElement('label', 'Distance of particle rings');
   ring_distance_slider_label.attribute('for', 'ring-slider');
   ring_distance_slider.changed(function() {
     var val = ring_distance_slider.value();
@@ -99,7 +99,9 @@ function setup() {
   });
 
   var ui = createDiv('');
+  var t = createElement('h1', 'Controls');
   ui.id('ui-buttons');
+  ui.child(t);
   // ui.child(wane_button);
   // ui.child(wax_button);
   // ui.child(rotCW_button);
@@ -167,12 +169,14 @@ function checkPhenomenon() {
 function draw() {
   noFill();
   stroke(255);
-  background(0, 100);
+  // background(0, 100);
+  background(0);
   translate(width/2, height/2);
 
   // if (checkPhenomenon()) {
 
-    world.positionParticles();
+    // world.positionParticles();
+    world.positionParticlesSimple();
     world.displayParticles();
     world.displayPhenomena();
     world.transformPhenomenon();
