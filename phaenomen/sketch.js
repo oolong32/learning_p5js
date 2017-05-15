@@ -8,12 +8,14 @@ var shift_up_button;
 var shift_down_button;
 var noise_slider;
 var noise_slider_label;
-var segment_slider;
+var segment_slider = 0;
 var segment_slider_label;
 var ring_slider;
 var ring_slider_label;
 var ring_distance_slider;
 var ring_distance_slider_label;
+var ring_color_slider;
+var ring_color_slider_label;
 
 function setup() {
   // pixelDensity(1.0);
@@ -56,7 +58,7 @@ function setup() {
   });
 
   // Slider Anzahl Segmente der Fühler
-  segment_slider = createSlider(0, 40, 20);
+  segment_slider = createSlider(0, 40, 0);
   segment_slider.id('segment-slider');
   segment_slider_label = createElement('label', 'Number of feeler segments');
   segment_slider_label.attribute('for', 'segment-slider');
@@ -72,7 +74,7 @@ function setup() {
   });
 
   // Slider Anzahl Partikel-Ringe
-  ring_slider = createSlider(0, 12, 4);
+  ring_slider = createSlider(0, 20, 0);
   ring_slider.id('ring-slider');
   ring_slider_label = createElement('label', 'Number of particle rings');
   ring_slider_label.attribute('for', 'ring-slider');
@@ -91,10 +93,22 @@ function setup() {
   ring_distance_slider_label.attribute('for', 'ring-slider');
   ring_distance_slider.changed(function() {
     var val = ring_distance_slider.value();
-    console.log(val);
     for (var i = 0; i < world.particles.length; i++) {
       var p = world.particles[i];
       p.ring_distance = val;
+    } 
+  });
+
+  // Slider Farbe Partikel-Ringe
+  ring_color_slider = createSlider(0, 255, 0);
+  ring_color_slider.id('ring-color-slider');
+  ring_color_slider_label = createElement('label', 'Color of particle rings');
+  ring_color_slider_label.attribute('for', 'ring-color-slider');
+  ring_color_slider.changed(function() {
+    var val = ring_color_slider.value();
+    for (var i = 0; i < world.particles.length; i++) {
+      var p = world.particles[i];
+      p.ring_color = val;
     } 
   });
 
@@ -116,6 +130,8 @@ function setup() {
   ui.child(ring_slider);
   ui.child(ring_distance_slider_label);
   ui.child(ring_distance_slider);
+  ui.child(ring_color_slider_label);
+  ui.child(ring_color_slider);
 
   // erstes mal einblenden der Eigenschaften der Phaenomene
   specs();

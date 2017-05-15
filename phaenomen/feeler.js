@@ -1,7 +1,7 @@
 function Feeler(x, y) {
   this.ready = false;
   this.segments = [];
-  this.number_of_segments = (segment_slider) ? segment_slider.value() : 20;
+  this.number_of_segments = (segment_slider) ? segment_slider.value() : 0;
   this.max_length_of_segments = 50;
 
   /*
@@ -51,12 +51,12 @@ function Feeler(x, y) {
       if (segment.growing) {
         this.growSegment(segment);
       } else {
-        this.shrinkSegment(segment);
+        this.retractSegment(segment);
       }
     }
   };
 
-  this.shrinkSegment = function(s) {
+  this.retractSegment = function(s) {
     s.pos.mult(0.9);
     if (s.pos.mag() < 1) {
       s.growing = true;

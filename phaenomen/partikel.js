@@ -7,8 +7,9 @@ function Partikel(n, v, r) {
   this.pos = v;
   this.r = r
   this.dir = v.normalize();
-  this.rings = 5; // benutzt um zusätziche ringe um die Partikel zu zeichnen.
+  this.rings = (segment_slider) ? segment_slider.value() : 0; // benutzt um zusätziche ringe um die Partikel zu zeichnen.
   this.ring_distance = 1.025;
+  this.ring_color = (ring_color_slider) ? ring_color_slider.value() : 0;
 
 
   // can we have some effect on the host besides a circle?
@@ -51,7 +52,9 @@ function Partikel(n, v, r) {
       point(this.pos.x, this.pos.y)
       push();
       strokeWeight(1);
-      stroke(255, 255, 255, 75);
+      var b = 100;
+      var c = color('hsba(' + this.ring_color + ', 100%, ' + b + '%, 1)');
+      stroke(c);
       var next = world.particles[(this.num + 1) % world.particles.length]
       line(this.pos.x, this.pos.y, next.pos.x, next.pos.y);
  
@@ -63,12 +66,14 @@ function Partikel(n, v, r) {
       new_vector.setMag(cur_length * this.ring_distance);
       new_next_vector.setMag(next_length * this.ring_distance);
       for (var i = 0; i < this.rings; i++) {
-        line(new_vector.x, new_vector.y, new_next_vector.x, new_next_vector.y)
+        c = color('hsba(' + this.ring_color + ', 100%, ' + b + '%, 1)');
+        stroke(c);
+        line(new_vector.x, new_vector.y, new_next_vector.x, new_next_vector.y);
         cur_length = new_vector.mag();
         next_length = new_next_vector.mag();
         new_vector.setMag(cur_length * this.ring_distance);
         new_next_vector.setMag(next_length * this.ring_distance);
-
+        b -= int(100/this.rings);
       }
       pop();
 

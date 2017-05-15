@@ -34,10 +34,10 @@ var specs = function(foo) {
     h2.innerHTML = 'Phenomenon ' + i;
     article.appendChild(h2);
     on = document.createElement('p');
-    on.innerHTML = 'Orig. nodes: ' + world.phenomena[i].nodes.length;
+    on.innerHTML = 'Orig.&#x2006;nodes: ' + world.phenomena[i].nodes.length;
     article.appendChild(on);
     cn = document.createElement('p');
-    cn.innerHTML =  'Curr. nodes: ' + world.phenomena[i].current_hosts.length;
+    cn.innerHTML =  'Curr.&#x2006;nodes: ' + world.phenomena[i].current_hosts.length;
     article.appendChild(cn);
     h = document.createElement('h3');
     h.innerHTML = 'Hosts';
