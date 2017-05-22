@@ -1,4 +1,25 @@
 "use strict"
+// Kommastellen prüfen
+// Kommastellen prüfen
+// Kommastellen prüfen
+// Kommastellen prüfen
+// Kommastellen prüfen
+// Kommastellen prüfen
+// Kommastellen prüfen
+// Kommastellen prüfen
+// Kommastellen prüfen
+// Kommastellen prüfen
+// Kommastellen prüfen
+// Kommastellen prüfen
+// Kommastellen prüfen
+// Kommastellen prüfen
+// Kommastellen prüfen
+// Kommastellen prüfen
+// Kommastellen prüfen
+// Kommastellen prüfen
+// Kommastellen prüfen
+// Kommastellen prüfen
+// Kommastellen prüfen
 var world;
 // var wane_button;
 // var wax_button;
@@ -186,7 +207,7 @@ function draw() {
   noFill();
   stroke(255);
   // background(0, 100);
-  background(0);
+  background(0, 80);
   translate(width/2, height/2);
 
   // if (checkPhenomenon()) {
