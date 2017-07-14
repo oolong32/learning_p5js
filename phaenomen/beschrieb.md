@@ -62,3 +62,45 @@ Das Phänomen hat eine *Repräsentation*, seine *sichtbare Form*. Diese Repräse
 Die sichtbare Form ändert sich überdies während einer Verwandlung: Knoten bewegen sich einer Reihe von Partikeln entlang, bis sie an einer neuen Position zur Ruhe kommen oder bis sie von einem anderen Knoten absorbiert werden.
 
 Die Repräsentation eines Phänomens ist nicht das Phänomen, sondern eine flüchtige Erscheinung, die auf das Phänomen verweist, es aber nicht tangiert.
+
+---
+
+## Ab Juli 2017
+
+### Was zeichnet was?
+
+Nach einigen Wochen Pause, brauche ich etwas Überblick. Der Code ist unordentlich und unübersichtlich geworden.
+
+Ich reduziere die Animation auf weniger Elemente und notiere, wo (Datei/Objekt) diese gesteuert werden.
+
+## Umrisslinie
+
+`phenomenon.display()`
+
+Die Umrisslinie wird gezeichnet in phaenomen.js, ca. Zeile 270.
+
+## Fühlersegmente
+
+`phenomenon.display()`
+
+Die Fühlersegmente werden gezeichnet in phaenomen.js, ca. Zeile 320.
+
+Es scheint, als ob es ein Fühlersegment mehr gäbe als Verbindungslinien gezeichnet werden. Möglich ist aber auch, dass hier die Sättigung auf 0 liegt, oder die Transparenz bei 255.
+
+## Verbindungslinien zwischen Fühlersegmentenden
+
+`phenomenon.display()`
+
+Die Verbindungslinien zwischen den Fühlersegmenten werden gezeichnet in phaenomenon.js, ca. Zeile 350.
+
+Die Farbe und Sättigung sollten mit HSL Definiert werden und sich an einem Wert orientieren, der von Phänomen zu Phänomen wechseln kann.
+
+## Partikel
+
+`phenomenon.display()`
+
+Werden aus phaenomenon aufgerufen, ca. 340
+
+Was gezeichnet wird, wird aber in particle.js definiert.
+
+`particle.display()` oder ähnlich.

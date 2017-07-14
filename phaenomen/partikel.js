@@ -21,16 +21,18 @@ function Partikel(n, v, r) {
   };
       
 
-  this.repraesentieren = function(option) {
+  this.display = function(option) {
     if (option) {
-      push();
-      stroke(200, 180, 0, 150);
-        ellipse(this.pos.x, this.pos.y, this.r, this.r);
+      // push();
+      // stroke(200, 180, 0, 150);
+      // stroke(0, 80);
+      // fill(0, random(20, 45));
+      // ellipse(this.pos.x, this.pos.y, this.r, this.r);
       // var radius = r;
       // for (var i = 0; i < 6; i++) {
       //   radius += 6;
       // }
-      pop();
+      // pop();
 
 //       push();
 //       stroke(200, 180, 0, circle.opacity);
@@ -49,11 +51,16 @@ function Partikel(n, v, r) {
 
 
     } else {
+      push();
+      strokeWeight(1)
       point(this.pos.x, this.pos.y)
+      pop();
+      /*
       push();
       strokeWeight(1);
-      var b = 100;
-      var c = color('hsba(' + this.ring_color + ', 100%, ' + b + '%, 1)');
+      var b = 0;
+      // saturation 100% = farbe sichtbar
+      var c = color('hsba(' + this.ring_color + ', 0%, ' + b + '%, 1)');
       stroke(c);
       var next = world.particles[(this.num + 1) % world.particles.length]
       line(this.pos.x, this.pos.y, next.pos.x, next.pos.y);
@@ -66,16 +73,17 @@ function Partikel(n, v, r) {
       new_vector.setMag(cur_length * this.ring_distance);
       new_next_vector.setMag(next_length * this.ring_distance);
       for (var i = 0; i < this.rings; i++) {
-        c = color('hsba(' + this.ring_color + ', 100%, ' + b + '%, 1)');
+        c = color('hsba(' + this.ring_color + ', 0%, ' + b + '%, 1)');
         stroke(c);
         line(new_vector.x, new_vector.y, new_next_vector.x, new_next_vector.y);
         cur_length = new_vector.mag();
         next_length = new_next_vector.mag();
         new_vector.setMag(cur_length * this.ring_distance);
         new_next_vector.setMag(next_length * this.ring_distance);
-        b -= int(100/this.rings);
+        b += int(100/this.rings);
       }
       pop();
+      */
 
     }
   };

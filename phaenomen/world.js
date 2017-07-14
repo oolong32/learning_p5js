@@ -20,15 +20,21 @@ function World(particles, phenomena) {
       this.particles.push(p);
     }
     // Partikel positionieren
-    // this.positionParticles(); // rechenintensiv
+    // this.positionParticles(); // rechenintensiv (3D Noise)
     this.positionParticlesSimple(); // simpler
+    
     // ===================
     // initialize phenomena
     // ===================
-    for (var i = 0; i < this.num_phenomena; i++) {
-      // bis auf Weiteres: Phaenomenon besteht aus zufälliger
-      // Auswahl verfügbarer Partikel.
-      var phenomenon = new Phenomenon((i+1) * 3);
+
+    // umbauen wie folgt:
+    // anzahl = data.length
+    // bisher: argument für new Phenomenon() war Anzahl Eckpunkte.
+    // Neu: das argument für new Phenomenon() wird ein Objekt
+    // Alles andere in phenomenon.js
+    for (var i = 0; i < data.length; i++) { // iterate over data from JSON stash
+      // Phänomene werden anhand einer JSON Datei generiert, die in preload() geladenw wird.
+      var phenomenon = new Phenomenon(data[i]);
       phenomenon.initialize();
       this.phenomena.push(phenomenon);
     }
@@ -49,7 +55,7 @@ function World(particles, phenomena) {
       var cos_a = cos(a);
       var sin_a = sin(a);
       var laerm = noise(cos_a + 1, sin_a + 1, this.ctr);
-      var range = this.noise_range; // auch dies besser this.turbulence oder so … könnte auch mit noise manipuliert werden?
+      var range = this.active_phenomenon.drift; // auch dies besser this.turbulence oder so … könnte auch mit noise manipuliert werden?
       var m = 220 + map(laerm, 0, 1, -range, range); // 220 = magnitude, should be a var of World (this.incentive) or something
       var x = cos_a * m;
       var y = sin_a * m;
@@ -72,7 +78,7 @@ function World(particles, phenomena) {
       var cos_a = cos(a);
       var sin_a = sin(a);
       var laerm = noise(xoff, yoff);
-      var range = this.noise_range;
+      var range = this.active_phenomenon ? this.active_phenomenon.drift : this.noise_range;
       var m = 220 + map(laerm, 0, 1, -range, range); // 220 = magnitude, should be a var of World (this.incentive) or something
       var x = cos_a * m;
       var y = sin_a * m;
@@ -87,10 +93,10 @@ function World(particles, phenomena) {
   // === ===== =====
   // Set Noise Range
   // === ===== =====
-  this.setNoiseRange = function(new_noise_range) {
-    this.noise_range = new_noise_range;
-    return true;
-  };
+  // this.setNoiseRange = function(new_noise_range) {
+  //   this.noise_range = new_noise_range;
+  //   return true;
+  // };
   
 
   // ====================
@@ -108,12 +114,13 @@ function World(particles, phenomena) {
           tar_phe_index:  this.active_phenomenon_index + i,
           cur_num_nodes:  this.active_phenomenon.current_hosts.length,
           tar_num_nodes:  this.phenomena[this.active_phenomenon_index + i].original_hosts.length || null, // <----?
-          cur_first_host: this.active_phenomenon.current_hosts[0],
-          tar_first_host: this.phenomena[this.active_phenomenon_index + i].original_hosts[0],
+          cur_first_host: this.active_phenomenon.current_hosts[0], // <---------------------------------------------------sollte hier nicht was anderes rauskommen als 0?
+          tar_first_host: this.phenomena[this.active_phenomenon_index + i].original_hosts[0], // <------------------------sollte hier nicht was anderes rauskommen als 0?
           // positions of all nodes need to be compared as well
           cur_hosts: null, // will be set ad hoc
           tar_hosts: null
         }; 
+        console.log(this.transformation_data);
       } else {
         console.log("Transformation in progress, please wait until it’s done"); // not sure if this needs to be tested at all
         // ok, this happens after we click the tranform button for the first time
@@ -127,6 +134,15 @@ function World(particles, phenomena) {
     if (!this.transformation_data) { // no data, no transformation
       return null; // is there a way to prevent calling this function at all without data etc.? not really, it gets called every frame :-/
     } else { // there is tranformation data, so let’s do it
+
+      // -- not sure yet if this is placed right
+      if (this.active_phenomenon.feelers_active == true) { // check if the feelers are active
+        this.active_phenomenon.feelers_active = false;
+      }
+      // Das ist alles gut und schön, aber es führt zu sehr schnellen übergängen. schöner wäre es, wenn das Zurückziehen der Fühler etwas länger sichtbar wäre.
+      this.active_phenomenon.normalizeBezierControlPoints();
+      // -- not sure yet if this is placed right
+
       if (!this.phenomena[this.transformation_data.tar_phe_index]) {
         console.log("no phenomenon left in this direction");
       } else {
@@ -212,7 +228,7 @@ function World(particles, phenomena) {
           } else {
             // not sure if this really happens anytime?
             console.log("waxing/waning in progress");
-          }
+          } 
         }
       } // transformation flow ends here
     }
@@ -224,7 +240,7 @@ function World(particles, phenomena) {
 
   this.displayParticles = function() {
     for (var i = 0; i < this.particles.length; i++) {
-      this.particles[i].repraesentieren(); // können wir die Namen der Methoden zur Darstellung vereinheitlichen bitte?
+      this.particles[i].display(); // können wir die Namen der Methoden zur Darstellung vereinheitlichen bitte?
     }
   }
 }

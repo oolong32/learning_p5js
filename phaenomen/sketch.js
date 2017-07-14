@@ -1,25 +1,4 @@
 "use strict"
-// Kommastellen prüfen
-// Kommastellen prüfen
-// Kommastellen prüfen
-// Kommastellen prüfen
-// Kommastellen prüfen
-// Kommastellen prüfen
-// Kommastellen prüfen
-// Kommastellen prüfen
-// Kommastellen prüfen
-// Kommastellen prüfen
-// Kommastellen prüfen
-// Kommastellen prüfen
-// Kommastellen prüfen
-// Kommastellen prüfen
-// Kommastellen prüfen
-// Kommastellen prüfen
-// Kommastellen prüfen
-// Kommastellen prüfen
-// Kommastellen prüfen
-// Kommastellen prüfen
-// Kommastellen prüfen
 var world;
 // var wane_button;
 // var wax_button;
@@ -37,6 +16,15 @@ var ring_distance_slider;
 var ring_distance_slider_label;
 var ring_color_slider;
 var ring_color_slider_label;
+
+var data;
+
+function preload() {
+  loadJSON("phenomena_stash.json", function(json_data) {
+    console.log('json loaded:', json_data);
+    data = json_data;
+  });
+}
 
 function setup() {
   // pixelDensity(1.0);
@@ -79,16 +67,17 @@ function setup() {
   });
 
   // Slider Anzahl Segmente der Fühler
-  segment_slider = createSlider(0, 40, 0);
+  segment_slider = createSlider(0, 10, 2);
   segment_slider.id('segment-slider');
   segment_slider_label = createElement('label', 'Number of feeler segments');
   segment_slider_label.attribute('for', 'segment-slider');
   segment_slider.changed(function() {
     var val = segment_slider.value();
-    console.log(val);
+    // console.log(val, 'Fühlersegmente');
     var f = world.active_phenomenon.feelers;
     if (f.length > 0); {
       for (var i = 0; i < f.length; i++) {
+        // Hier wird eingestellt, wie viele Segmente ein Fühler hat.
         f[i].number_of_segments = val; 
       }
     }
@@ -205,9 +194,9 @@ function checkPhenomenon() {
 
 function draw() {
   noFill();
-  stroke(255);
+  stroke(0);
   // background(0, 100);
-  background(0, 80);
+  background(255, 150);
   translate(width/2, height/2);
 
   // if (checkPhenomenon()) {
