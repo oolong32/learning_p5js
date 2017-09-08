@@ -8,12 +8,13 @@ function World(particles, phenomena) {
   this.transformation_data = null;
   this.ctr = Math.random() * 1000; // für noise
   this.noise_range = 0;
-
+  this.radius = null;
 
   this.initialize = function() {
     // =======================
     // Partikel initialisieren
     // =======================
+    this.radius = Math.floor(Math.min(windowWidth, windowHeight) * 0.4); // kleinerer Wert zum Aufbau des Partikelrings
     for (var n = 0; n < this.num_particles; n++) {
       var v = createVector();
       var p = new Partikel(n, v, 20);
@@ -38,7 +39,8 @@ function World(particles, phenomena) {
       phenomenon.initialize();
       this.phenomena.push(phenomenon);
     }
-    var active = Math.trunc(this.phenomena.length / 2); // <----------------------- hardcoded, muss weg, gäll?
+    // var active = Math.trunc(this.phenomena.length / 2); // <----------------------- hardcoded, muss weg, gäll?
+    var active = 0;
     this.active_phenomenon = this.phenomena[active];
     this.active_phenomenon_index = active;
     var now = new Date();
@@ -56,7 +58,7 @@ function World(particles, phenomena) {
       var sin_a = sin(a);
       var laerm = noise(cos_a + 1, sin_a + 1, this.ctr);
       var range = this.active_phenomenon.drift; // auch dies besser this.turbulence oder so … könnte auch mit noise manipuliert werden?
-      var m = 220 + map(laerm, 0, 1, -range, range); // 220 = magnitude, should be a var of World (this.incentive) or something
+      var m = this.radius + map(laerm, 0, 1, -range, range); // 220 = magnitude, should be a var of World (this.incentive) or something
       var x = cos_a * m;
       var y = sin_a * m;
       this.particles[i].pos.x = x;
@@ -128,111 +130,224 @@ function World(particles, phenomena) {
     }
   };
 
-  // Verwandlung
+  // Verwandlung mit Callbacks
   // ===========
   this.transformPhenomenon = function() {
     if (!this.transformation_data) { // no data, no transformation
-      return null; // is there a way to prevent calling this function at all without data etc.? not really, it gets called every frame :-/
+      console.log('Function transformPhenomenon called without transformation data');
+      return;  // is there a way to prevent calling this function at all without data etc.?
+               // Not really, it gets called every frame :-/
     } else { // there is tranformation data, so let’s do it
-
-      // -- not sure yet if this is placed right
-      if (this.active_phenomenon.feelers_active == true) { // check if the feelers are active
-        this.active_phenomenon.feelers_active = false;
+      if (!this.phenomena[this.transformation_data.tar_phe_index]) { // Prüfen, ob es ein Zielphönomen gibt
+        console.log('no phenomenon left in this direction');
+        return;
+      } else { // Target phenomenon exists, let’s go
+        // First step, next steps are called as callbacks
+        transformFeelers(this, this.transformation_data, transformNodeNumber);
       }
-      // Das ist alles gut und schön, aber es führt zu sehr schnellen übergängen. schöner wäre es, wenn das Zurückziehen der Fühler etwas länger sichtbar wäre.
-      this.active_phenomenon.normalizeBezierControlPoints();
-      // -- not sure yet if this is placed right
+    }
 
-      if (!this.phenomena[this.transformation_data.tar_phe_index]) {
-        console.log("no phenomenon left in this direction");
+    // step 1
+    function transformFeelers(that, data, callback) {
+      if (that.active_phenomenon.feelers_active) {
+        // reduziert die Länge der Fühlersegmente (?) um 90% – ist das hier richtig? hat es überhaupt einen Einfluss?
+        that.active_phenomenon.normalizeBezierControlPoints();
+        // führt zu sehr schnellen übergängen. schöner wäre es, wenn das Zurückziehen der Fühler etwas länger sichtbar wäre.
+        that.active_phenomenon.feelers_active = false;
       } else {
-      var data = this.transformation_data;
-        if (data.cur_num_nodes === data.tar_num_nodes) { // is the number of nodes the same?  
-          // console.log("number of nodes adjusted");
+        console.log('Step 1: Feelers retracted');
+        callback(that, data, transformRotation);
+        return;
+      }
+    }
 
-          if (data.cur_first_host === data.tar_first_host) { // is the position of the first nodes the same?
-            // console.log("rotation finished, that is …");
-            // console.log("position of first nodes synced");
+    // step 2
+    function transformNodeNumber(that, data, callback) {
+      if (data.cur_num_nodes !== data.tar_num_nodes) { // Current number of nodes differs from target phenomenon
+        // console.log('we have ' + data.cur_num_nodes);
+        // console.log('we need ' + data.tar_num_nodes);
+        if (data.cur_num_nodes < data.tar_num_nodes && that.active_phenomenon.wane === false) {
+          that.active_phenomenon.pushNode();
+          that.transformation_data.cur_num_nodes = that.active_phenomenon.current_hosts.length; // update data
+          specs('update');
+        } else {
+          that.active_phenomenon.pullNode(); // while it’s pulling/pushing, nothing else should happen!
+          that.transformation_data.cur_num_nodes = that.active_phenomenon.current_hosts.length; // update data
+          specs('update');
+        }
+      } else { // if number of nodes not the same – ANGLEICHEN KNOTENZAHL
+        console.log('Step 2: Number of nodes adjusted');
+        callback(that, data, swapPhenomena);
+        return;
+      }
+    }
 
-            if (data.cur_num_nodes > 1) { // are there more nodes than the first one?
-              // console.log("wait … there are more nodes that need processing");
-              // add list of nodes to transformation_data (ad hoc)
-              this.transformation_data.cur_hosts = this.active_phenomenon.current_hosts;
-              this.transformation_data.tar_hosts = this.phenomena[data.tar_phe_index].original_hosts;
+    // step 3
+    function transformRotation(that, data, callback) { // falscher Name, oder?
+      // FOURTH STEP (Rotation: stimmt die Position des ersten Knoten mit jener des Zielphänomens überein?)
+      if (data.cur_first_host !== data.tar_first_host) { // The position of the first nodes differs – ROTATE
+        // console.log('position first node current: ' + data.cur_first_host);
+        // console.log('position first node target: ' + data.tar_first_host);
+        if (data.cur_first_host < data.tar_first_host) {
+          that.active_phenomenon.rotateCW();
+          that.transformation_data.cur_first_host = that.active_phenomenon.current_hosts[0]; // update data
+        } else {
+          that.active_phenomenon.rotateCCW();
+          that.transformation_data.cur_first_host = that.active_phenomenon.current_hosts[0]; // update data
+        }
+      } else { // The position of first nodes is the same – ROATION COMPLETE
+        // console.log('Rotation complete: position of first nodes synced');
 
-              // update data
-              data = this.transformation_data;
+        // console.log('wait … there are more nodes that need processing');
+        // add list of nodes to transformation_data (ad hoc)
+        // these objects should be added once, not allways!!!!!!!!!!!!!!!!!!!!!!!!
+        // okokok, that should happen only once
+        that.transformation_data.cur_hosts = that.active_phenomenon.current_hosts;
+        that.transformation_data.tar_hosts = that.phenomena[data.tar_phe_index].original_hosts;
+        data = that.transformation_data; // update data to get the two new values, should happen once only !!!!!!!!!!!!!!!
 
-              // compare current & target hosts
-              var cur_hosts = this.transformation_data.cur_hosts;
-              var tar_hosts = this.transformation_data.tar_hosts;
-              var all_synced = true; // optimistic premise
-              for (var i = 1; i < cur_hosts.length; i++) { // process unsynced nodes
-                if (cur_hosts[i] != tar_hosts[i]) {
-                  all_synced = false;
-                  if (cur_hosts[i] < tar_hosts[i]) {
-                    this.active_phenomenon.replaceHostRight(i); 
-                    this.transformation_data.cur_hosts[i] = this.active_phenomenon.current_hosts[i]; // update data
-                  } else {
-                    this.active_phenomenon.replaceHostLeft(i); 
-                    this.transformation_data.cur_hosts[i] = this.active_phenomenon.current_hosts[i]; // update data
-                  }
-                }
-                specs('update'); // update specs;
-              }
-              if (all_synced) { // we thought we’re done …
-                // console.log("en sync");
-                // console.log("set new index to swap phenomena. was " + this.active_phenomenon_index + ", new: " + this.transformation_data.tar_phe_index);
-                this.active_phenomenon = this.phenomena[this.transformation_data.tar_phe_index]; // swap phenomena
-                this.active_phenomenon_index = this.transformation_data.tar_phe_index; // set new index
-
-
-                // dies scheint länger zu dauern. wie können wir warten, bis da was zurückkommt?
-                this.phenomena[data.cur_phe_index].resetNodes(); // reset hosts in original phenomenon
-                // console.log(this.phenomena[data.cur_phe_index].current_hosts);
-
-                this.transformation_data = null; // reset transformation data object
-                // console.log("swapped and done");
-                specs("update");
-              } 
-            } else { // there’s only one node, and it’s in place
-              //
-              // proceed to swapping phenomena
-              // not covered so far. do we ever have to?
-              //
-            }
-          } else { // position of first node is not the same
-            // console.log("position first node current: " + data.cur_first_host);
-            // console.log("position first node target: " + data.tar_first_host);
-            if (data.cur_first_host < data.tar_first_host) {
-              // we might as well push/pull it
-              this.active_phenomenon.rotateCW();
-              this.transformation_data.cur_first_host = this.active_phenomenon.current_hosts[0]; // update data
-              // so far we haven’t looked at the other nodes, so we can leave them alone
+        // compare current & target hosts
+        var cur_hosts = that.transformation_data.cur_hosts;
+        var tar_hosts = that.transformation_data.tar_hosts;
+        for (var i = 1; i < cur_hosts.length; i++) { // process unsynced nodes
+          if (cur_hosts[i] != tar_hosts[i]) {
+            if (cur_hosts[i] < tar_hosts[i]) { // hier liegt wahrscheinlich der grund für den 'letzten dreher' <--- !!!
+              that.active_phenomenon.replaceHostRight(i); 
+              that.transformation_data.cur_hosts[i] = that.active_phenomenon.current_hosts[i]; // update data
             } else {
-              this.active_phenomenon.rotateCCW();
-              this.transformation_data.cur_first_host = this.active_phenomenon.current_hosts[0]; // update data
+              that.active_phenomenon.replaceHostLeft(i); 
+              that.transformation_data.cur_hosts[i] = that.active_phenomenon.current_hosts[i]; // update data
             }
           }
-        } else { // if number of nodes not the same
-          // console.log("we have " + data.cur_num_nodes);
-          // console.log("we need " + data.tar_num_nodes);
-          if (data.cur_num_nodes < data.tar_num_nodes && this.active_phenomenon.wane === false) {
-            this.active_phenomenon.pushNode();
-            this.transformation_data.cur_num_nodes = this.active_phenomenon.current_hosts.length; // update data
-            specs('update'); // update specs;
-          } else if (data.cur_num_nodes > data.tar_num_nodes && this.active_phenomenon.wax === false){
-            this.active_phenomenon.pullNode(); // while it’s pulling/pushing, nothing else should happen!
-            this.transformation_data.cur_num_nodes = this.active_phenomenon.current_hosts.length; // update data
-            specs('update'); // update specs;
-          } else {
-            // not sure if this really happens anytime?
-            console.log("waxing/waning in progress");
-          } 
         }
-      } // transformation flow ends here
+        console.log('Step 4: Rotation complete');
+        callback(that, data);
+        return; // was ist best practice bei callbacks? return sollte drin sein, oder?
+      }
     }
-  };
+
+    // step 5
+    function swapPhenomena(that, data) {
+      console.log('All nodes en sync!');
+      // console.log('set new index to swap phenomena. was ' + this.active_phenomenon_index + ', new: ' + this.transformation_data.tar_phe_index);
+      that.active_phenomenon = that.phenomena[that.transformation_data.tar_phe_index]; // swap phenomena
+      that.active_phenomenon_index = that.transformation_data.tar_phe_index; // set new index
+      that.phenomena[data.cur_phe_index].resetNodes(); // reset nodes in original phenomenon
+      that.transformation_data = null; // reset transformation data object
+      specs('update');
+      console.log('Step 5: Phenomena swapped');
+      return;
+    }
+
+  } // ends function ‘transformPhenomenon’
+
+  //  bis hier: neu neu neu, verwandlung mit callbacks
+
+  // Verwandlung
+  // ===========
+  // this.transformPhenomenon = function() {
+  //   if (!this.transformation_data) { // no data, no transformation
+  //     return null; // is there a way to prevent calling this function at all without data etc.? not really, it gets called every frame :-/
+  //   } else { // there is tranformation data, so let’s do it
+
+  //     // -- not sure yet if this is placed right
+  //     if (this.active_phenomenon.feelers_active == true) { // check if the feelers are active
+  //       this.active_phenomenon.feelers_active = false;
+  //     }
+  //     // Das ist alles gut und schön, aber es führt zu sehr schnellen übergängen. schöner wäre es, wenn das Zurückziehen der Fühler etwas länger sichtbar wäre.
+  //     this.active_phenomenon.normalizeBezierControlPoints();
+  //     // -- not sure yet if this is placed right
+
+  //     if (!this.phenomena[this.transformation_data.tar_phe_index]) {
+  //       console.log("no phenomenon left in this direction");
+  //     } else {
+  //     var data = this.transformation_data;
+  //       if (data.cur_num_nodes === data.tar_num_nodes) { // is the number of nodes the same?  
+  //         // console.log("number of nodes adjusted");
+
+  //         if (data.cur_first_host === data.tar_first_host) { // is the position of the first nodes the same?
+  //           // console.log("rotation finished, that is …");
+  //           // console.log("position of first nodes synced");
+
+  //           if (data.cur_num_nodes > 1) { // are there more nodes than the first one?
+  //             // console.log("wait … there are more nodes that need processing");
+  //             // add list of nodes to transformation_data (ad hoc)
+  //             this.transformation_data.cur_hosts = this.active_phenomenon.current_hosts;
+  //             this.transformation_data.tar_hosts = this.phenomena[data.tar_phe_index].original_hosts;
+
+  //             // update data
+  //             data = this.transformation_data;
+
+  //             // compare current & target hosts
+  //             var cur_hosts = this.transformation_data.cur_hosts;
+  //             var tar_hosts = this.transformation_data.tar_hosts;
+  //             var all_synced = true; // optimistic premise
+  //             for (var i = 1; i < cur_hosts.length; i++) { // process unsynced nodes
+  //               if (cur_hosts[i] != tar_hosts[i]) {
+  //                 all_synced = false;
+  //                 if (cur_hosts[i] < tar_hosts[i]) {
+  //                   this.active_phenomenon.replaceHostRight(i); 
+  //                   this.transformation_data.cur_hosts[i] = this.active_phenomenon.current_hosts[i]; // update data
+  //                 } else {
+  //                   this.active_phenomenon.replaceHostLeft(i); 
+  //                   this.transformation_data.cur_hosts[i] = this.active_phenomenon.current_hosts[i]; // update data
+  //                 }
+  //               }
+  //               specs('update'); // update specs;
+  //             }
+  //             if (all_synced) { // we thought we’re done …
+  //               // console.log("en sync");
+  //               // console.log("set new index to swap phenomena. was " + this.active_phenomenon_index + ", new: " + this.transformation_data.tar_phe_index);
+  //               this.active_phenomenon = this.phenomena[this.transformation_data.tar_phe_index]; // swap phenomena
+  //               this.active_phenomenon_index = this.transformation_data.tar_phe_index; // set new index
+
+
+  //               // dies scheint länger zu dauern. wie können wir warten, bis da was zurückkommt?
+  //               this.phenomena[data.cur_phe_index].resetNodes(); // reset hosts in original phenomenon
+  //               // console.log(this.phenomena[data.cur_phe_index].current_hosts);
+
+  //               this.transformation_data = null; // reset transformation data object
+  //               // console.log("swapped and done");
+  //               specs("update");
+  //             } 
+  //           } else { // there’s only one node, and it’s in place
+  //             //
+  //             // proceed to swapping phenomena
+  //             // not covered so far. do we ever have to?
+  //             //
+  //           }
+  //         } else { // position of first node is not the same
+  //           // console.log("position first node current: " + data.cur_first_host);
+  //           // console.log("position first node target: " + data.tar_first_host);
+  //           if (data.cur_first_host < data.tar_first_host) {
+  //             // we might as well push/pull it
+  //             this.active_phenomenon.rotateCW();
+  //             this.transformation_data.cur_first_host = this.active_phenomenon.current_hosts[0]; // update data
+  //             // so far we haven’t looked at the other nodes, so we can leave them alone
+  //           } else {
+  //             this.active_phenomenon.rotateCCW();
+  //             this.transformation_data.cur_first_host = this.active_phenomenon.current_hosts[0]; // update data
+  //           }
+  //         }
+  //       } else { // if number of nodes not the same
+  //         // console.log("we have " + data.cur_num_nodes);
+  //         // console.log("we need " + data.tar_num_nodes);
+  //         if (data.cur_num_nodes < data.tar_num_nodes && this.active_phenomenon.wane === false) {
+  //           this.active_phenomenon.pushNode();
+  //           this.transformation_data.cur_num_nodes = this.active_phenomenon.current_hosts.length; // update data
+  //           specs('update'); // update specs;
+  //         } else if (data.cur_num_nodes > data.tar_num_nodes && this.active_phenomenon.wax === false){
+  //           this.active_phenomenon.pullNode(); // while it’s pulling/pushing, nothing else should happen!
+  //           this.transformation_data.cur_num_nodes = this.active_phenomenon.current_hosts.length; // update data
+  //           specs('update'); // update specs;
+  //         } else {
+  //           // not sure if this really happens anytime?
+  //           console.log("waxing/waning in progress");
+  //         } 
+  //       }
+  //     } // transformation flow ends here
+  //   }
+  // };
 
   this.displayPhenomena = function() {
     this.active_phenomenon.display("yes");
