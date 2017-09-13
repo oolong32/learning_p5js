@@ -4,45 +4,56 @@ html, * {
 }
 
 body {
-  padding: 20px 10px 0;
-  margin: 1em;
   background: white;
   color: black;
-  font-family: InputMonoNarrow, 'helvetica neue';
-  font-weight: 100;
+  font-family: InputMonoNarrow, consolas, monaco, 'helvetica neue';
+  font-weight: 400;
   font-feature-settings: "ss01", "ss02", "ss03"; 
   font-size: 10px;
   /* GRID */
   display: grid;
-  grid-template-columns: repeat(9, [col] 120px);
+  grid-template-columns: 240px 1fr 360px;
   grid-template-rows: auto;
   grid-gap: 10px;
 }
 
 .phenomena-specs {
+  padding: 20px 10px 0;
   grid-column-start: 1;
+  grid-column-end: 2;
   grid-row-start: 1;
 }
 
 canvas {
-  grid-column-start: 2;
+  grid-column-start: 1;
   grid-row-start: 1;
-  grid-column-end: 6;
 }
 
 #ui-buttons {
-  grid-column: 7/9;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-weight: 300;
+  font-weight: 400;
 }
 
 #ui-buttons {
+  padding: 20px 10px 0;
+  grid-column-start: 3;
+  grid-row-start: 1;
   display: grid;
-  grid-template-columns: 185px 185px;
-  grid-template-rows: repeat(100, [row] 30px);
+  grid-template-columns: 140px 140px;
+  grid-auto-rows: 50px;
   grid-gap: 10px;
+}
+
+#ui-buttons ul {
+  grid-column: 2;
+  font-size: 14px;
+  list-style: none;
+}
+
+#ui-buttons ul {
+  cursor: pointer;
 }
 
 #ui-buttons h1 {
@@ -133,5 +144,5 @@ article h3 {
 }
 
 article.active {
-  color: black;
+  color: red;
 }
