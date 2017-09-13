@@ -7,9 +7,9 @@ function Partikel(n, v, r) {
   this.pos = v;
   this.r = r
   this.dir = v.normalize();
-  this.rings = (segment_slider) ? segment_slider.value() : 0; // benutzt um zusätziche ringe um die Partikel zu zeichnen.
-  this.ring_distance = 1.025;
-  this.ring_color = (ring_color_slider) ? ring_color_slider.value() : 0;
+  // this.rings = (segment_slider) ? segment_slider.value() : 0; // benutzt um zusätziche ringe um die Partikel zu zeichnen.
+  // this.ring_distance = 1.025;
+  // this.ring_color = (ring_color_slider) ? ring_color_slider.value() : 0;
 
 
   // can we have some effect on the host besides a circle?
