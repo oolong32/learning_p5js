@@ -43,7 +43,7 @@ function World(particles, phenomena) {
     var active = 0;
     this.active_phenomenon = this.phenomena[active];
     this.active_phenomenon_index = active;
-    var now = new Date();
+    var now = new Date(); // <-------------------------------------------------------- wozu das, ist doch ein Riesenquatsch!?
     this.active_phenomenon.timestamp = now.getTime();
   };
 
@@ -104,6 +104,23 @@ function World(particles, phenomena) {
   // ====================
   // Verwandlung auslösen
   // ====================
+  // Nichtlineare Verwandlung (neu)
+
+  this.jumpToPhenomenon = function(index) {
+    if (index == this.active_phenomenon_index) {
+      console.log('Alredy displaying this phenomenon, yo.');
+      return;
+    } else {
+      this.active_phenomenon.resetNodes(); // reset nodes in original phenomenon
+      this.active_phenomenon = this.phenomena[index]; // swap phenomena
+      this.active_phenomenon_index = index; // set new index
+      specs('update');
+      return;
+    }
+    
+  };
+
+  // Schrittweise Verwandlung (alt)
   this.initializeTransformation = function(i) {
     if (!this.phenomena[this.active_phenomenon_index + i]) {
       console.log("no more phenomena in this direction");
@@ -118,11 +135,18 @@ function World(particles, phenomena) {
           tar_num_nodes:  this.phenomena[this.active_phenomenon_index + i].original_hosts.length || null, // <----?
           cur_first_host: this.active_phenomenon.current_hosts[0], // <---------------------------------------------------sollte hier nicht was anderes rauskommen als 0?
           tar_first_host: this.phenomena[this.active_phenomenon_index + i].original_hosts[0], // <------------------------sollte hier nicht was anderes rauskommen als 0?
+          cur_hue_end: this.active_phenomenon.hue_end,
+          cur_brightness_end: this.active_phenomenon.brightness_end, 
+          cur_saturation: this.active_phenomenon.saturation, 
+          cur_transparency: this.active_phenomenon.transparency, 
           // positions of all nodes need to be compared as well
           cur_hosts: null, // will be set ad hoc
-          tar_hosts: null
+          tar_hosts: null,
+          semgments_to_retract: this.active_phenomenon.feelers[0].segments.length, // current number of segments
+          frames_to_rotation: 30, // countdown after retracting all segments
+          frames_elapsed: 0 // let’s count how long the transformation takes
         }; 
-        console.log(this.transformation_data);
+        // console.log(this.transformation_data);
       } else {
         console.log("Transformation in progress, please wait until it’s done"); // not sure if this needs to be tested at all
         // ok, this happens after we click the tranform button for the first time
@@ -133,31 +157,70 @@ function World(particles, phenomena) {
   // Verwandlung mit Callbacks
   // ===========
   this.transformPhenomenon = function() {
+    // this gets called every frame, this is not very efficient :-(
+    // only when there is data in ‘transformation_data’ the transformation acutally happens
     if (!this.transformation_data) { // no data, no transformation
-      console.log('Function transformPhenomenon called without transformation data');
-      return;  // is there a way to prevent calling this function at all without data etc.?
-               // Not really, it gets called every frame :-/
+      // console.log('Function transformPhenomenon called without transformation data');
+      return;
     } else { // there is tranformation data, so let’s do it
       if (!this.phenomena[this.transformation_data.tar_phe_index]) { // Prüfen, ob es ein Zielphönomen gibt
         console.log('no phenomenon left in this direction');
         return;
       } else { // Target phenomenon exists, let’s go
         // First step, next steps are called as callbacks
-        transformFeelers(this, this.transformation_data, transformNodeNumber);
+        // measure time
+        this.transformation_data.frames_elapsed += 1;
+        // Animated Transformation
+        // transformFeelers(this, this.transformation_data, transformNodeNumber); // ‘this’ muss übergeben werden, wahrscheinlich entfiele diese Notwendigkeit, wenn die Funktionen als Variablen deklalriert würden.
+        // Transform without animation
+        swapPhenomena(this, this.transformation_data); // ‘this’ muss übergeben werden, wahrscheinlich entfiele diese Notwendigkeit, wenn die Funktionen als Variablen deklalriert würden.
       }
     }
 
     // step 1
     function transformFeelers(that, data, callback) {
       if (that.active_phenomenon.feelers_active) {
-        // reduziert die Länge der Fühlersegmente (?) um 90% – ist das hier richtig? hat es überhaupt einen Einfluss?
-        that.active_phenomenon.normalizeBezierControlPoints();
-        // führt zu sehr schnellen übergängen. schöner wäre es, wenn das Zurückziehen der Fühler etwas länger sichtbar wäre.
-        that.active_phenomenon.feelers_active = false;
+        // that.active_phenomenon.normalizeBezierControlPoints(); // <------------------------------------was tut das, warum brauchts das?
+        var phenomenon = that.active_phenomenon;
+        // retract furthermost feelers
+        // Dieser ganze Prozess dauert zu lange, am Schluss zu schnell.
+        // console.log("extracted segments = " + data.semgments_to_retract);
+        if (data.semgments_to_retract) {
+          // console.log('retracting', data.semgments_to_retract - 1);
+          var retracted = true;
+          // console.log('Retracting ' + data.cur_num_nodes + 'th segment');
+          for (var i = 0; i < data.cur_num_nodes; i++) {
+            var feeler = that.active_phenomenon.feelers[i];
+            var segment = feeler.segments[data.semgments_to_retract - 1];
+            segment.growing = false;
+            if (segment.pos.mag() > 1) {
+              var retracted = false; // we’ll need to iterate over this segment and its siblings again
+              // das folgende ist noch nicht gut!
+              // console.log('magnitude was ' + segment.pos.mag());
+              segment.pos.setMag(0);
+              // console.log('magnitude is ' + segment.pos.mag());
+            }
+          }
+          if (retracted) { // furthermost segment retracted
+            data.semgments_to_retract -= 1; // set index for next iteration
+            return; // start over, no more feelers
+          } else {
+            return; // start over, continue retracting
+          }
+        } else { // all retracted
+          that.active_phenomenon.feelers_active = false;
+          // console.log('feelers deactivated');
+          return;
+        }
       } else {
-        console.log('Step 1: Feelers retracted');
-        callback(that, data, transformRotation);
-        return;
+        if (data.frames_to_rotation) {
+          data.frames_to_rotation -= 1; // total unbefriedigend: es muss etwas gewartet werden, aber die fühler sind schon ausgeblendet
+            // dieser ganze ablauf könnte stimmiger sein :-(
+        } else { // countdown to rotation elapsed
+          // console.log('Step 1: Feelers retracted');
+          callback(that, data, transformRotation);
+          return;
+        }
       }
     }
 
@@ -175,8 +238,8 @@ function World(particles, phenomena) {
           that.transformation_data.cur_num_nodes = that.active_phenomenon.current_hosts.length; // update data
           specs('update');
         }
-      } else { // if number of nodes not the same – ANGLEICHEN KNOTENZAHL
-        console.log('Step 2: Number of nodes adjusted');
+      } else { // Knotenzahl gleich
+        // console.log('Step 2: Number of nodes adjusted');
         callback(that, data, swapPhenomena);
         return;
       }
@@ -200,8 +263,6 @@ function World(particles, phenomena) {
 
         // console.log('wait … there are more nodes that need processing');
         // add list of nodes to transformation_data (ad hoc)
-        // these objects should be added once, not allways!!!!!!!!!!!!!!!!!!!!!!!!
-        // okokok, that should happen only once
         that.transformation_data.cur_hosts = that.active_phenomenon.current_hosts;
         that.transformation_data.tar_hosts = that.phenomena[data.tar_phe_index].original_hosts;
         data = that.transformation_data; // update data to get the two new values, should happen once only !!!!!!!!!!!!!!!
@@ -228,28 +289,29 @@ function World(particles, phenomena) {
 
     // step 5
     function swapPhenomena(that, data) {
-      console.log('All nodes en sync!');
       // console.log('set new index to swap phenomena. was ' + this.active_phenomenon_index + ', new: ' + this.transformation_data.tar_phe_index);
       that.active_phenomenon = that.phenomena[that.transformation_data.tar_phe_index]; // swap phenomena
       that.active_phenomenon_index = that.transformation_data.tar_phe_index; // set new index
       that.phenomena[data.cur_phe_index].resetNodes(); // reset nodes in original phenomenon
-      that.transformation_data = null; // reset transformation data object
+      // reset hue etc. in original phenomenon
+      that.phenomena[data.cur_phe_index].hue_end = data.cur_hue_end;
+      that.phenomena[data.cur_phe_index].brightness_end = data.cur_brightness_end;
+      that.phenomena[data.cur_phe_index].saturation = data.cur_saturation;
+      that.phenomena[data.cur_phe_index].transparency = data.cur_transparency;
+      // reset transformation data object
+      that.transformation_data = null;
       specs('update');
-      console.log('Step 5: Phenomena swapped');
       return;
     }
-
   } // ends function ‘transformPhenomenon’
 
-  //  bis hier: neu neu neu, verwandlung mit callbacks
-
+// ab hier löschen bei gelegenheit
   // Verwandlung
   // ===========
   // this.transformPhenomenon = function() {
   //   if (!this.transformation_data) { // no data, no transformation
   //     return null; // is there a way to prevent calling this function at all without data etc.? not really, it gets called every frame :-/
   //   } else { // there is tranformation data, so let’s do it
-
   //     // -- not sure yet if this is placed right
   //     if (this.active_phenomenon.feelers_active == true) { // check if the feelers are active
   //       this.active_phenomenon.feelers_active = false;
@@ -257,27 +319,22 @@ function World(particles, phenomena) {
   //     // Das ist alles gut und schön, aber es führt zu sehr schnellen übergängen. schöner wäre es, wenn das Zurückziehen der Fühler etwas länger sichtbar wäre.
   //     this.active_phenomenon.normalizeBezierControlPoints();
   //     // -- not sure yet if this is placed right
-
   //     if (!this.phenomena[this.transformation_data.tar_phe_index]) {
   //       console.log("no phenomenon left in this direction");
   //     } else {
   //     var data = this.transformation_data;
   //       if (data.cur_num_nodes === data.tar_num_nodes) { // is the number of nodes the same?  
   //         // console.log("number of nodes adjusted");
-
   //         if (data.cur_first_host === data.tar_first_host) { // is the position of the first nodes the same?
   //           // console.log("rotation finished, that is …");
   //           // console.log("position of first nodes synced");
-
   //           if (data.cur_num_nodes > 1) { // are there more nodes than the first one?
   //             // console.log("wait … there are more nodes that need processing");
   //             // add list of nodes to transformation_data (ad hoc)
   //             this.transformation_data.cur_hosts = this.active_phenomenon.current_hosts;
   //             this.transformation_data.tar_hosts = this.phenomena[data.tar_phe_index].original_hosts;
-
   //             // update data
   //             data = this.transformation_data;
-
   //             // compare current & target hosts
   //             var cur_hosts = this.transformation_data.cur_hosts;
   //             var tar_hosts = this.transformation_data.tar_hosts;
@@ -300,12 +357,9 @@ function World(particles, phenomena) {
   //               // console.log("set new index to swap phenomena. was " + this.active_phenomenon_index + ", new: " + this.transformation_data.tar_phe_index);
   //               this.active_phenomenon = this.phenomena[this.transformation_data.tar_phe_index]; // swap phenomena
   //               this.active_phenomenon_index = this.transformation_data.tar_phe_index; // set new index
-
-
   //               // dies scheint länger zu dauern. wie können wir warten, bis da was zurückkommt?
   //               this.phenomena[data.cur_phe_index].resetNodes(); // reset hosts in original phenomenon
   //               // console.log(this.phenomena[data.cur_phe_index].current_hosts);
-
   //               this.transformation_data = null; // reset transformation data object
   //               // console.log("swapped and done");
   //               specs("update");
@@ -348,6 +402,7 @@ function World(particles, phenomena) {
   //     } // transformation flow ends here
   //   }
   // };
+// bis hier löschen bei gelegenheit
 
   this.displayPhenomena = function() {
     this.active_phenomenon.display("yes");

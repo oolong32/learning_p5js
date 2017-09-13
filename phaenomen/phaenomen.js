@@ -8,7 +8,7 @@ function Phenomenon(dataset) {
 
   this.number_of_corners = parseInt(map(dataset.property01, 0, 12, 3, 21)) || 0; // Welche maximale Anzahl soll erlaubt sein?
   this.anzahl_partikel = world.particles.length || 0;
-  console.log(this.anzahl_partikel);
+  // console.log(this.anzahl_partikel);
   this.wane = false;
   this.wax = false;
 
@@ -41,17 +41,17 @@ function Phenomenon(dataset) {
   // Kurvenform zu geben. Es braucht einen pro Host.
   this.bezierControlPoints = [];
 
+  this.drift = null; // Bewegung der Partikel
   this.hue_end = null;
   this.hue_start = null;
-  this.stroke_weight_end = 1;
-  this.stroke_weight_start = 1;
-  this.drift = null; // Bewegung der Partikel
-  this.segment_number = null;
-  this.segment_length = null;
+  this.saturation = null;
   this.brightness_end = null;
   this.brightness_start = null;
   this.transparency = null;
-  this.saturation = null;
+  this.stroke_weight_end = 1;
+  this.stroke_weight_start = 1;
+  this.segment_number = null;
+  this.segment_length = null;
 
   // Das Phänomen initialisieren
   // ===========================
@@ -98,6 +98,8 @@ function Phenomenon(dataset) {
     for (var i = 0; i < this.current_hosts.length; i++) {
       this.feelers.push(new Feeler());
       // Aktivierung geschieht innerhalb der Methode "display"
+      // Hypothese (weil ich mich nicht erinnere): Fühler ist leer und enthält
+      // zu diesem Zeitpunkt noch keine Segmente.
     }
 
     // Bezierkontrollpunkte
@@ -113,22 +115,25 @@ function Phenomenon(dataset) {
       this.bezierControlPoints.push(cp);
     }
 
+    // Ausschlag der Partikel, wird in world.js bei Positionierung d. Partikel verwendet
+    this.drift = map(dataset.property01, 0, 12, 0, 120);
     // Farbton
     this.hue_start = parseInt(map(dataset.property02, 0, 12, 0, 359)); 
-    this.hue_end = parseInt(map(dataset.property12, 0, 12, 0, 359)); 
+    this.hue_end   = parseInt(map(dataset.property03, 0, 12, 0, 359)); 
+    // Sättigung
+    this.saturation = Math.ceil(map(dataset.property04, 0, 12, 30, 100));
+    // Helligkeit
+    this.brightness_end   = Math.ceil(map(dataset.property05, 0, 12, 10, 100));
+    this.brightness_start = Math.ceil(map(dataset.property06, 0, 12, 10, 100));
+    // Transparenz
+    this.transparency = Math.round(map(dataset.property07, 0, 12, 0.5, 1) * 1000) / 1000;
     // Linienstärke
-    this.stroke_weight_start = parseInt(map(dataset.property03, 0, 12, 1, 40)); 
-    // this.stroke_weight_end = parseInt(map(dataset.property04, 0, 12, 1, 40)); 
-    this.stroke_weight_end = 1; 
-    // Ausschlag der Partikel, wird in world.js bei Positionierung d. Partikel verwendet
-    this.drift = map(dataset.property05, 0, 12, 0, 120);
+    // this.stroke_weight_end = 1; // scheint bessere Bilder zu geben
+    this.stroke_weight_end = parseInt(map(dataset.property11, 0, 12, 1, 40)); 
+    this.stroke_weight_start = parseInt(map(dataset.property08, 0, 12, 1, 40)); 
     // Fühler, wird verwendet in feeler.js
-    this.segment_number = Math.ceil(map(dataset.property06, 0, 12, 0, 36));
-    this.segment_length = Math.ceil(map(dataset.property07, 0, 12, 0, 120));
-    this.brightness_end = Math.ceil(map(dataset.property09, 0, 12, 0, 100));
-    this.brightness_start = Math.ceil(map(dataset.property08, 0, 12, 0, 100));
-    this.transparency = map(dataset.property10, 0, 12, 0.5, 1);
-    this.saturation = Math.ceil(map(dataset.property11, 0, 12, 50, 100));
+    this.segment_number = Math.ceil(map(dataset.property09, 0, 12, 1, 36));
+    this.segment_length = Math.ceil(map(dataset.property10, 0, 12, 0, 120));
 
   };
 
@@ -313,14 +318,13 @@ function Phenomenon(dataset) {
   };
 
   this.display = function(option) {
+
     // setup feelers
     // =============
     push();
-    if (this.feelers.length != this.current_hosts.length) {
-      // ob dieser Fall jemals auftritt?
-      // könnte obsolet sein
-      console.error("Watch out, feelers and nodes not en sync!\nfeelers:", this.feelers.length, "\ncurrent hosts:", this.current_hosts.length);
-    }
+    // if (this.feelers.length != this.current_hosts.length) {
+    //   console.error("Watch out, feelers and nodes not en sync!\nfeelers:", this.feelers.length, "\ncurrent hosts:", this.current_hosts.length);
+    // }
 
     var test_feeler = this.feelers[0]; // Ziel: unabhängig von diesem Testfühler werden!!!!  <----------------------
     if (!this.feelers_active && world.transformation_data) { // Verwandlung in Vollzug
@@ -331,8 +335,9 @@ function Phenomenon(dataset) {
       }
     } else if (!this.feelers_active && Date.now() - this.age > 1000) { // kommt das überhaupt vor hier?
       for (var i = 0; i < this.feelers.length; i++) {
+        // aktiviert alle inaktiven Fühler
         this.feelers_active = true;
-        // console.log("feelers active");
+        console.log("feelers active");
       }
     }
     if (this.feelers_active) {
@@ -344,32 +349,55 @@ function Phenomenon(dataset) {
 
     // Verbindungslinien zwischen Fühlersegmenten
     // ==========================================
-    // problem --- was passiert bei verwandlungen?
-    // es _muss_ möglich sein, alle Fühler einzufahren und erst dann die Verwandlung zu starten
     push();
-    if (this.segment_number == this.feelers[0].segments.length) {
-      var hue = this.hue_start;
-      var sw = this.stroke_weight_start;
-      var brightness = this.brightness_start;
-      var saturation = this.saturation / this.segment_number;
-      var transp = this.transparency / this.segment_number;
-      for (var i = this.segment_number - 1; i >= 0; i--) { // wieviele Segmente?
-        // was zuerst gezeichnet wird ist auf canvas zuunterst (am weitesten weg)
-        // deshalb zuerst die segmente zeichnen, die am weitesten vom ursprungspunkt
-        // (d.h. dem host) entfernt sind.
-        if (this.brightness_start < this.brightness_end) {
-          var bdif = this.brightness_end - this.brightness_start;
-          brightness += bdif / (this.segment_number + 1);
+    if (this.feelers[0].segments.length) { // if there are segments
+
+      // Iterate once through all feelers/segments
+      // Was zuerst gezeichnet wird, ist auf Canvas zuunterst (am weitesten weg).
+      // Deshalb zuerst jene Segmente zeichnen, die am weitesten vom Host entfernt sind.
+      // Entsprechend heisst 'end' zuoberst, 'start' zuunterst.
+
+      // Difference & step for strokeweight, hue, brightness etc.
+      var swdif = Math.abs(this.stroke_weight_end - this.stroke_weight_start);
+      var swstep = swdif / this.segment_number;
+      // Hue
+      var hdif = Math.abs(this.hue_end - this.hue_start);
+      var hstep = parseInt(hdif / this.segment_number);
+      // Brightness
+      var bdif = Math.abs(this.brightness_end - this.brightness_start);
+      var bstep = parseInt(bdif / this.segment_number);
+      // Saturation & Transparency have no variable end values
+      // they are invariably fractured by number of segments
+      var sstep = parseInt(this.saturation / this.segment_number);
+      var tstep = parseInt(this.transparency / this.segment_number);
+
+      var cur_segments = this.feelers[0].segments.length; // current number of segments
+      for (var i = cur_segments - 1; i >= 0; i--) {
+        // Strichstärke
+        if (this.stroke_weight_start < this.stroke_weight_end) {
+          var sw = this.stroke_weight_end - i*swstep;
         } else {
-          var bdif = this.brightness_start - this.brightness_end;
-          brightness -= bdif / (this.segment_number + 1);
+          sw = this.stroke_weight_end + i*swstep;
         }
-        // if (frameCount % 60 == 0 && i == 0) {
-        //   console.log(brightness);
-        // }
+        // Farbton
+        if (this.hue_start < this.hue_end) {
+          var hue = parseInt(this.hue_end - i*hstep);
+        } else {
+          var hue = parseInt(this.hue_end + i*hstep);
+        }
+        // Helligkeit
+        if (this.brightness_start < this.brightness_end) { // hell vor dunkel
+          var brightness = this.brightness_end - i*bstep;
+        } else {
+          var brightness = this.brightness_end + i*bstep;
+        }
+        // Saturation
+        var saturation = this.saturation - i*sstep;
+        var transp = this.transparency - i*tstep;
+        // Linienfarbe
         stroke('hsba(' + hue + ', ' + saturation + '%, ' + brightness + '%, ' + transp + ')');
         strokeWeight(sw);
-        strokeJoin(ROUND);
+        strokeJoin(BEVEL);
         beginShape();
         for (var j = this.current_hosts.length - 1; j >= 0; j--) {
           var cur_particle = world.particles[this.current_hosts[j]];
@@ -385,23 +413,6 @@ function Phenomenon(dataset) {
           // ellipse(segment_position.x, segment_position.y, 4, 4);
         }
         endShape(CLOSE);
-        saturation += this.saturation / this.segment_number;
-        transp += this.transparency / this.segment_number;
-        if (this.stroke_weight_start < this.stroke_weight_end) {
-          // wenn stroke_weight_end hardcoded 1 ist, wird dies kaum je der Fall sein
-          var swdif = this.stroke_weight_end - this.stroke_weight_start;
-          sw += swdif / this.segment_number; 
-        } else {
-          var swdif = this.stroke_weight_start - this.stroke_weight_end;
-          sw -= swdif / this.segment_number; 
-        }
-        if (this.hue_start < this.hue_end) {
-          var hdif = this.hue_end - this.hue_start;
-          sw += hdif / this.segment_number; 
-        } else {
-          var hdif = this.hue_start - this.hue_end;
-          sw -= hdif / this.segment_number; 
-        }
       }
     }
     pop();
@@ -487,6 +498,7 @@ function Phenomenon(dataset) {
     push();
     // stroke(255, 50, 0);
     stroke('hsba(' + this.hue_end + ', ' + this.saturation + '%, ' + this.brightness_end + '%, ' + this.transparency + ')');
+    // if (frameCount % 60 == 0) {console.log(`hsl(${this.hue_end}, ${this.saturation}%, ${this.brightness_end}%)`);}
     strokeWeight(this.stroke_weight_end);
     strokeJoin(ROUND);
     beginShape();

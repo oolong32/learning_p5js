@@ -1,53 +1,28 @@
 "use strict"
+
 var world;
-// var wane_button;
-// var wax_button;
-// var rotCW_button;
-// var rotCCW_button;
 var shift_up_button;
 var shift_down_button;
-var noise_slider;
-var noise_slider_label;
-var segment_slider = 0;
-var segment_slider_label;
-var ring_slider;
-var ring_slider_label;
-var ring_distance_slider;
-var ring_distance_slider_label;
-var ring_color_slider;
-var ring_color_slider_label;
 
 var data;
 
 function preload() {
   loadJSON("phenomena_stash.json", function(json_data) {
-    console.log('json loaded:', json_data);
+    // console.log('json loaded:', json_data);
     data = json_data;
   });
 }
 
 function setup() {
-  // pixelDensity(1.0);
-  createCanvas(640, 600);
   // frameRate(5);
+  // pixelDensity(1.0);
+  // createCanvas(900, 600);
+  createCanvas(windowWidth, windowHeight);
   
   var particles = 40;
   var phenomena = 5;
   world = new World(particles, phenomena);
   world.initialize();
-
-  // Buttons (testweise) bedenke: wir wollen nicht nur
-  // vergrössern/-kleinern, sondern zwischen Phänomen wechseln.
-  // wane_button = createButton('Wane');
-  // wax_button = createButton('Wax');
-  // wane_button.mousePressed(wanePhenomenon);
-  // wax_button.mousePressed(waxPhenomenon);
-
-  // Buttons zum Testen Rotation
-  // rotCW_button = createButton('Rotate Clockwise');
-  // rotCCW_button = createButton('Rotate Counterclockwise');
-  // rotCW_button.mousePressed(rotCW);
-  // rotCCW_button.mousePressed(rotCCW);
 
   // Button zum umschalten zwischen den Phänomenen
   shift_up_button = createButton('Shift Up');
@@ -55,96 +30,41 @@ function setup() {
   shift_up_button.mousePressed(shiftUp);
   shift_down_button.mousePressed(shiftDown);
 
-  // Slider Varianz Noise
-  noise_slider = createSlider(0, 120, 0);
-  noise_slider.id('noise-slider');
-  noise_slider_label = createElement('label', 'Amount of noise');
-  noise_slider_label.attribute('for', 'noise-slider');
-  noise_slider.changed(function() {
-    var val = noise_slider.value();
-    console.log(val);
-    world.setNoiseRange(val);
-  });
-
-  // Slider Anzahl Segmente der Fühler
-  segment_slider = createSlider(0, 10, 2);
-  segment_slider.id('segment-slider');
-  segment_slider_label = createElement('label', 'Number of feeler segments');
-  segment_slider_label.attribute('for', 'segment-slider');
-  segment_slider.changed(function() {
-    var val = segment_slider.value();
-    // console.log(val, 'Fühlersegmente');
-    var f = world.active_phenomenon.feelers;
-    if (f.length > 0); {
-      for (var i = 0; i < f.length; i++) {
-        // Hier wird eingestellt, wie viele Segmente ein Fühler hat.
-        f[i].number_of_segments = val; 
-      }
-    }
-  });
-
-  // Slider Anzahl Partikel-Ringe
-  ring_slider = createSlider(0, 20, 0);
-  ring_slider.id('ring-slider');
-  ring_slider_label = createElement('label', 'Number of particle rings');
-  ring_slider_label.attribute('for', 'ring-slider');
-  ring_slider.changed(function() {
-    var val = ring_slider.value();
-    for (var i = 0; i < world.particles.length; i++) {
-      var p = world.particles[i];
-      p.rings = val;
-    } 
-  });
-
-  // Slider Distanz Partikel-Ringe
-  ring_distance_slider = createSlider(0.75, 1.25, 1.025, 0.025);
-  ring_distance_slider.id('ring-slider');
-  ring_distance_slider_label = createElement('label', 'Distance of particle rings');
-  ring_distance_slider_label.attribute('for', 'ring-slider');
-  ring_distance_slider.changed(function() {
-    var val = ring_distance_slider.value();
-    for (var i = 0; i < world.particles.length; i++) {
-      var p = world.particles[i];
-      p.ring_distance = val;
-    } 
-  });
-
-  // Slider Farbe Partikel-Ringe
-  ring_color_slider = createSlider(0, 255, 0);
-  ring_color_slider.id('ring-color-slider');
-  ring_color_slider_label = createElement('label', 'Color of particle rings');
-  ring_color_slider_label.attribute('for', 'ring-color-slider');
-  ring_color_slider.changed(function() {
-    var val = ring_color_slider.value();
-    for (var i = 0; i < world.particles.length; i++) {
-      var p = world.particles[i];
-      p.ring_color = val;
-    } 
-  });
-
   var ui = createDiv('');
   var t = createElement('h1', 'Controls');
   ui.id('ui-buttons');
   ui.child(t);
-  // ui.child(wane_button);
-  // ui.child(wax_button);
-  // ui.child(rotCW_button);
-  // ui.child(rotCCW_button);
   ui.child(shift_up_button);
   ui.child(shift_down_button);
-  ui.child(noise_slider_label);
-  ui.child(noise_slider);
-  ui.child(segment_slider_label);
-  ui.child(segment_slider);
-  ui.child(ring_slider_label);
-  ui.child(ring_slider);
-  ui.child(ring_distance_slider_label);
-  ui.child(ring_distance_slider);
-  ui.child(ring_color_slider_label);
-  ui.child(ring_color_slider);
+
+  // Navigation
+  var listOfPhenomena = document.createElement('ul');
+  ui.child(listOfPhenomena);
+  for (var i = 0; i < world.phenomena.length; i++) {
+    var li = document.createElement('li');
+    li.setAttribute('index', i);
+    li.innerHTML = 'Phenomenon N°' + i;
+    li.addEventListener('click', function(e) {
+      var index = parseInt(e.target.getAttribute('index'));
+      world.jumpToPhenomenon(index); 
+    });
+    li.addEventListener('mouseover', function(e) {
+      var index = parseInt(e.target.getAttribute('index'));
+      e.target.style.backgroundColor = 'hsla(' + world.phenomena[index].hue_start + ', ' + world.phenomena[index].saturation + '%, ' + world.phenomena[index].brightness_start + '%, 0.2)';
+    });
+    li.addEventListener('mouseout', function(e) {
+      e.target.style.backgroundColor = 'transparent';
+    });
+    li.style.color = 'hsl(' + world.phenomena[i].hue_end + ', ' + world.phenomena[i].saturation + '%, ' + world.phenomena[i].brightness_end + '%)';
+    listOfPhenomena.appendChild(li);
+  }
 
   // erstes mal einblenden der Eigenschaften der Phaenomene
   specs();
+}
+
+function windowResized() {
+	resizeCanvas(windowWidth, windowHeight);
 }
 
 function waxPhenomenon() {
@@ -166,7 +86,8 @@ function rotCCW() {
 function shiftUp() {
   // hier sollte gefragt werden, ob der shift schon ausgelöst wurde.
   // eine entsprechende Variable muss in world.js angelegt werden.
-  // in draw muss für jedes frame shiftPhenomenon ausegführt werden, wahrsch. ohne argument
+  // in draw muss für jedes frame shiftPhenomenon ausegführt werden,
+  // wahrsch. ohne argument.
   // world.shiftToPhenomenon(1);
   world.initializeTransformation(1);
 };
@@ -199,22 +120,19 @@ function draw() {
   background(255, 150);
   translate(width/2, height/2);
 
-  // if (checkPhenomenon()) {
+  // world.positionParticles();
+  world.positionParticlesSimple();
+  world.displayParticles();
+  world.displayPhenomena();
+  world.transformPhenomenon();
 
-    // world.positionParticles();
-    world.positionParticlesSimple();
-    world.displayParticles();
-    world.displayPhenomena();
-    world.transformPhenomenon();
+  if (world.active_phenomenon.wane === true) { // wahrsch.
+    // wärs gescheiter, diese bedingung im
+    // objekt world oder phenomenon unterzubringen?
+    world.active_phenomenon.pullNode();
+  }
 
-    if (world.active_phenomenon.wane === true) { // wahrsch.
-      // wärs gescheiter, diese bedingung im
-      // objekt world oder phenomenon unterzubringen?
-      world.active_phenomenon.pullNode();
-    }
-
-    if (world.active_phenomenon.wax === true) { // dito.
-      world.active_phenomenon.pushNode();
-    }
-  // }
+  if (world.active_phenomenon.wax === true) { // dito.
+    world.active_phenomenon.pushNode();
+  }
 }
