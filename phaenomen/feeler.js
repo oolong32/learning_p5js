@@ -8,43 +8,22 @@ function Feeler(x, y) {
    * ein Fühler ist eine Sammlung aus Vektoren.
    * diese Vektoren bilden eine Kette
    * sie entwachsen einem Partikel/Host (oder einem Knoten?)
-   * sie beginnen zu wachen, wenn sie genug Zeit haben.
+   * sie beginnen zu wachsen, wenn sie genug Zeit haben.
    *
    * Vielleicht braucht es
    * - eine Beschränkung der Segment-Länge
    * - eine Methode zum Einziehen der Fühler   <------------------------------------ YES!
    *
-   * Sind die Fühler Eigenschaft der Partikel/Hosts?
-   * Wäre es nicht besser, sie gehörten zu den Knoten?
    */
-
-  this.whatTimeIsIt = function() {
-    var t = new Date();
-    var now = t.getTime();
-    var then = world.active_phenomenon.age;
-    var age_of_phenomenon = (now - then) / 100;
-    if (!this.ready && age_of_phenomenon > 4) {
-      this.ready = true; // Feeler can start doing it’s thing
-    }
-    return(age_of_phenomenon); // <-------------------------------------- ist doch quatsch?
-    // All dies gehört ins Phönomen, nicht hierher.
-    // All dies gehört ins Phönomen, nicht hierher.
-    // All dies gehört ins Phönomen, nicht hierher.
-  };
 
   this.addSegment = function() { // fügt dem Fühler ein Segment hinzu
     var num = world.active_phenomenon ? world.active_phenomenon.segment_number : this.number_of_segments;
-    if (this.segments.length < num) {
+    if (this.segments.length < num && frameCount % 10 === 0) { // steuert Geschwindigkeit des Aufbaus
       var segment = {
         pos: createVector(0, 0),
         growing: true
       };
-      this.segments.unshift(segment); // ich habe den Verdacht, dass hier laufend hinzugefügt und gelöscht wird, das ist doch hohl!!!!!!!!!
-      return;
-    } else if (this.segments.length > num) {
-      // überzählige segmente löschen
-      var excess_segments = this.segments.length - num;
-      this.segments.splice(0, excess_segments);
+      this.segments.unshift(segment);
       return;
     } else {
       // all is well
@@ -61,22 +40,37 @@ function Feeler(x, y) {
         this.retractSegment(segment);
       }
     }
+    return;
   };
 
   this.retractSegment = function(s) { // verkürzt Segment, bis es kleiner als 1 ist.
+    // ein furchtbarer Verdacht: passiert das überhaupt?
+    // ein furchtbarer Verdacht: passiert das überhaupt?
+    // ein furchtbarer Verdacht: passiert das überhaupt?
+    // ein furchtbarer Verdacht: passiert das überhaupt?
+    // ein furchtbarer Verdacht: passiert das überhaupt?
+    // TESTEN mit bedeutend kleinerem Faktor (September)
+    // ein furchtbarer Verdacht: passiert das überhaupt?
+    // ein furchtbarer Verdacht: passiert das überhaupt?
+    // ein furchtbarer Verdacht: passiert das überhaupt?
+    // ein furchtbarer Verdacht: passiert das überhaupt?
+    // ein furchtbarer Verdacht: passiert das überhaupt?
     s.pos.mult(0.99);
     if (s.pos.mag() < 1) {
       s.growing = true;
     }
+    return;
   };
 
   this.growSegment = function(s) { // verlängert Segment, bis es «ausgewachsen» ist
-    s.pos.x += Math.random() * 2 - 1;
-    s.pos.y += Math.random() * 2 - 1;
+    var factor = 4;
+    s.pos.x += Math.random()*factor - factor/2;
+    s.pos.y += Math.random()*factor - factor/2;
     var max_length = world.active_phenomenon ? world.active_phenomenon.segment_length : this.max_length_of_segments;
     if (s.pos.mag() > max_length) {
       s.growing = false;
     }
+    return;
   };
 
   this.segmentFromOrigin = function(i) { // Returns Vector from origin to single segment’s tip.
